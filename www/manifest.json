@@ -1,0 +1,18 @@
+{
+  "name": "Night City RPG — Obsidian & SUAP Mobile",
+  "short_name": "NightCity RPG",
+  "description": "Sistema RPG Cyberpunk sincronizado com Obsidian, SUAP IFF, Google Classroom e Pop-ups de Daily Quests.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07070c",
+  "theme_color": "#07070c",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

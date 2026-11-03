@@ -1,0 +1,9 @@
+{
+  "id": "night-city-rpg",
+  "name": "Night City RPG — Gamificação",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Transforma suas tarefas em quests: ganhe XP, suba de nível, evolua de classe a cada 10 níveis (Cyberpunk 2077, Witcher, Halo, Skyrim...), desbloqueie conquistas e evolua atributos.",
+  "author": "totemicpuma",
+  "isDesktopOnly": false
+}

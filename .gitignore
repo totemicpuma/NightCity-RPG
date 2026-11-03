@@ -1,0 +1,24 @@
+# Python cache & environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Build artifacts & heavy binaries
+dist/
+tools/*.exe
+tools/*.jar
+www/*.apk
+*.idsig
+*.7z
+*.zip
+
+# Node / Expo
+node_modules/
+.expo/
+
+# Configuracoes locais de usuario
+notification_settings.json
+data.json

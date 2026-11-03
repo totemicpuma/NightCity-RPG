@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Night City RPG // Cyberdeck",
+    "slug": "night-city-rpg-mobile",
+    "version": "2.0.77",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#06070b",
+    "primaryColor": "#fcee0a",
+    "android": {
+      "package": "com.cyberdeck.nightcityrpg",
+      "adaptiveIcon": {
+        "backgroundColor": "#06070b"
+      },
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "SCHEDULE_EXACT_ALARM",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#fcee0a"
+        }
+      ]
+    ]
+  }
+}

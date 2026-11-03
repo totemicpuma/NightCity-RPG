@@ -1,0 +1,2522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#08080e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icon.png" type="image/png" />
+  <title>Night City RPG</title>
+  <style>
+    :root {
+      --bg-dark: #08080e;
+      --bg-card: #11121d;
+      --bg-card-alt: #171928;
+      --neon-yellow: #fcee0a;
+      --neon-cyan: #00f0ff;
+      --neon-red: #ff003c;
+      --neon-green: #00ff9f;
+      --neon-purple: #b388ff;
+      --neon-orange: #ff8c00;
+      --text-main: #f2f4fa;
+      --text-muted: #8c90a8;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(0, 240, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 100%, rgba(255, 0, 60, 0.08), transparent 40%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: calc(80px + var(--safe-bottom));
+    }
+
+    /* ---------------- TOPBAR COMPACTA ---------------- */
+    .app-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      background: rgba(8, 8, 14, 0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.22);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      width: 32px;
+      height: 32px;
+      background: var(--neon-yellow);
+      color: #08080e;
+      font-weight: 900;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(252, 238, 10, 0.35);
+    }
+
+    .brand-title {
+      font-size: 0.92rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .brand-sub {
+      font-size: 0.68rem;
+      color: var(--neon-cyan);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .icon-btn {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      color: var(--neon-cyan);
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.96);
+    }
+
+    .icon-btn.btn-reset {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.22);
+      color: var(--text-main);
+      font-size: 0.68rem;
+      padding: 5px 9px;
+    }
+
+    /* ---------------- LAYOUT & CARDS ---------------- */
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .tab-view {
+      display: none;
+      animation: fadeIn 0.16s ease-out;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cyber-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--neon-cyan);
+      border-radius: 10px;
+      padding: 13px;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .cyber-card.yellow { border-left-color: var(--neon-yellow); }
+    .cyber-card.red { border-left-color: var(--neon-red); }
+    .cyber-card.green { border-left-color: var(--neon-green); }
+    .cyber-card.purple { border-left-color: var(--neon-purple); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ---------------- HERO HUD COMPACTA (SEM POLUIÇÃO VISUAL) ---------------- */
+    .hud-top {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .hud-avatar {
+      width: 48px;
+      height: 48px;
+      border: 2px solid var(--neon-yellow);
+      border-radius: 10px;
+      background: rgba(252, 238, 10, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.55rem;
+      flex-shrink: 0;
+    }
+
+    .hud-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hud-name {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--text-main);
+      line-height: 1.15;
+    }
+
+    .hud-class {
+      font-size: 0.76rem;
+      color: var(--neon-cyan);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .hud-lvl-box {
+      text-align: center;
+      background: rgba(252, 238, 10, 0.12);
+      border: 1px solid rgba(252, 238, 10, 0.45);
+      border-radius: 8px;
+      padding: 5px 10px;
+      min-width: 54px;
+    }
+
+    .hud-lvl-lbl {
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .hud-lvl-num {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--neon-yellow);
+      line-height: 1.05;
+    }
+
+    .xp-bar-wrap {
+      margin-top: 10px;
+    }
+
+    .xp-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .xp-bar-track {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-yellow), var(--neon-red));
+      border-radius: 99px;
+      transition: width 0.35s ease;
+    }
+
+    .quick-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .quick-stat-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 7px;
+      padding: 5px 6px;
+      text-align: center;
+    }
+
+    .quick-stat-pill strong {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    .quick-stat-pill span {
+      color: var(--text-muted);
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .attrs-compact-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin-top: 9px;
+    }
+
+    .attr-chip {
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 2px solid var(--neon-cyan);
+      border-radius: 7px;
+      padding: 5px 4px;
+      text-align: center;
+    }
+
+    .attr-chip-key {
+      font-size: 0.64rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .attr-chip-val {
+      font-size: 0.86rem;
+      font-weight: 900;
+      margin-top: 1px;
+      display: block;
+    }
+
+    /* ---------------- QUEST ROWS ---------------- */
+    .quest-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-left: 3px solid var(--neon-cyan);
+      border-radius: 8px;
+      margin-bottom: 7px;
+      transition: opacity 0.15s ease, background 0.15s ease;
+    }
+
+    .quest-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .quest-item.done {
+      opacity: 0.55;
+      border-left-color: var(--neon-green);
+    }
+
+    .quest-item.type-boss { border-left-color: var(--neon-red); }
+    .quest-item.type-main { border-left-color: var(--neon-yellow); }
+    .quest-item.type-weekly { border-left-color: var(--neon-purple); }
+    .quest-item.type-daily { border-left-color: var(--neon-green); }
+    .quest-item.type-side { border-left-color: var(--neon-cyan); }
+
+    .quest-check {
+      width: 26px;
+      height: 26px;
+      border: 1.5px solid var(--neon-cyan);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.45);
+      color: var(--neon-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.9rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .quest-item.done .quest-check {
+      border-color: var(--neon-green);
+      background: rgba(0, 255, 159, 0.2);
+    }
+
+    .quest-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .quest-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.28;
+      word-break: break-word;
+    }
+
+    .quest-item.done .quest-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .quest-sub {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .xp-tag {
+      color: var(--neon-yellow);
+      font-weight: 800;
+    }
+
+    .notif-toggle-btn {
+      border: 1px solid rgba(0, 255, 159, 0.4);
+      background: rgba(0, 255, 159, 0.12);
+      color: var(--neon-green);
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 5px 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .notif-toggle-btn.off {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .mini-act-btn {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ---------------- FILTROS & TABELAS ---------------- */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      scrollbar-width: none;
+    }
+
+    .filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border-radius: 99px;
+      padding: 6px 12px;
+      font-size: 0.73rem;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      border-color: var(--neon-yellow);
+      background: rgba(252, 238, 10, 0.15);
+      color: var(--neon-yellow);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .cyber-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    .cyber-table th {
+      background: rgba(255, 0, 60, 0.14);
+      color: var(--neon-yellow);
+      text-align: left;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--neon-red);
+      text-transform: uppercase;
+      font-size: 0.66rem;
+    }
+
+    .cyber-table td {
+      padding: 7px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* ---------------- SWITCH MODERNO ---------------- */
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .switch-row:last-child {
+      border-bottom: none;
+    }
+
+    .cyber-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 99px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .cyber-switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #aaa;
+      transition: all 0.2s;
+    }
+
+    .cyber-switch.on {
+      background: rgba(0, 255, 159, 0.28);
+      box-shadow: 0 0 8px rgba(0, 255, 159, 0.3);
+    }
+
+    .cyber-switch.on::after {
+      left: 23px;
+      background: var(--neon-green);
+    }
+
+    /* ---------------- BOTTOM NAVIGATION (5 ABAS COMPLETAS) ---------------- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(8, 8, 14, 0.96);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding-bottom: var(--safe-bottom);
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.64rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .nav-btn .nav-ico {
+      font-size: 1.18rem;
+    }
+
+    .nav-btn.active {
+      color: var(--neon-yellow);
+      border-top: 2px solid var(--neon-yellow);
+      background: rgba(252, 238, 10, 0.05);
+    }
+
+    /* ---------------- FAB NOVA QUEST ---------------- */
+    .fab-add {
+      position: fixed;
+      right: 16px;
+      bottom: calc(72px + var(--safe-bottom));
+      z-index: 95;
+      background: var(--neon-yellow);
+      color: #08080e;
+      border: none;
+      border-radius: 99px;
+      font-weight: 900;
+      font-size: 0.82rem;
+      padding: 11px 16px;
+      box-shadow: 0 4px 18px rgba(252, 238, 10, 0.45);
+      cursor: pointer;
+    }
+
+    /* ---------------- MODAL NOVA / EDITAR QUEST ---------------- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0, 0, 0, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      background: #121320;
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      padding: 16px;
+    }
+
+    .form-field {
+      margin-bottom: 11px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--neon-cyan);
+      margin-bottom: 4px;
+    }
+
+    .cyber-input, .cyber-select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 7px;
+      color: #fff;
+      padding: 9px 10px;
+      font-size: 0.86rem;
+      font-family: inherit;
+    }
+
+    .toast-xp {
+      position: fixed;
+      bottom: calc(82px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 250;
+      background: rgba(12, 13, 22, 0.96);
+      border: 1.5px solid var(--neon-yellow);
+      border-radius: 99px;
+      color: var(--neon-yellow);
+      padding: 8px 16px;
+      font-weight: 900;
+      font-size: 0.82rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      display: none;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR ENXUTA -->
+  <header class="app-topbar">
+    <div class="brand-wrap">
+      <div class="brand-badge">⚡</div>
+      <div>
+        <div class="brand-title">NIGHT CITY RPG</div>
+        <div class="brand-sub" id="topClassSub">CARREGANDO...</div>
+      </div>
+    </div>
+    <button class="icon-btn" onclick="triggerDailyPopupNow(true)" title="Enviar Daily Quests pendentes para a barra de notificações do Android">
+      📲 Notificar
+    </button>
+  </header>
+
+  <!-- TOAST FEEDBACK -->
+  <div class="toast-xp" id="xpToast">⚡ +10 XP</div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="container">
+
+    <!-- ==================== ABA 1: HUD & ROTINA (LIMPA E DIRETA) ==================== -->
+    <section class="tab-view active" id="tab-hud">
+
+      <!-- HUD COMPACTA DE APLICATIVO -->
+      <div class="cyber-card yellow" id="hudCard">
+        <div class="hud-top">
+          <div class="hud-avatar" id="hudAvatar">💾</div>
+          <div class="hud-info">
+            <div class="hud-name" id="hudPlayerName">Netrunner V</div>
+            <div class="hud-class" id="hudClassName">Netrunner Aprendiz · Cyberpunk 2077</div>
+          </div>
+          <div class="hud-lvl-box">
+            <div class="hud-lvl-lbl">NÍVEL</div>
+            <div class="hud-lvl-num" id="hudLevelNum">12</div>
+          </div>
+        </div>
+
+        <div class="xp-bar-wrap">
+          <div class="xp-bar-labels">
+            <span id="hudXpText">XP 120 / 245</span>
+            <span id="hudXpRemain">faltam 125 XP</span>
+          </div>
+          <div class="xp-bar-track">
+            <div class="xp-bar-fill" id="hudXpFill" style="width: 49%"></div>
+          </div>
+        </div>
+
+        <div class="quick-stats-row">
+          <div class="quick-stat-pill">
+            <strong id="statTotalXp">💠 1450</strong>
+            <span>XP Total</span>
+          </div>
+          <div class="quick-stat-pill">
+            <strong id="statTasks">✅ 38</strong>
+            <span>Feitas</span>
+          </div>
+          <div class="quick-stat-pill">
+            <strong id="statStreak">🔥 7d</strong>
+            <span>Streak</span>
+          </div>
+          <div class="quick-stat-pill">
+            <strong id="statIra">🎓 9,0</strong>
+            <span>CR / Taxa</span>
+          </div>
+        </div>
+
+        <!-- ATRIBUTOS EM LINHA ÚNICA COMPACTA -->
+        <div class="attrs-compact-grid" id="hudAttrsContainer"></div>
+      </div>
+
+      <!-- DAILY QUESTS -->
+      <div class="cyber-card green">
+        <div class="card-header">
+          <div class="card-title">🔁 Daily Quests (+10 XP)</div>
+          <div class="card-actions">
+            <button class="icon-btn" onclick="pinWidgetToHomeScreen()" title="Fixar o Widget de Quests direto na Tela Inicial do celular">
+              📌 Widget
+            </button>
+            <button class="icon-btn btn-reset" onclick="resetDailyQuestsNow()" title="Desmarcar todas as Daily Quests para iniciar um novo dia">
+              🔄 Resetar
+            </button>
+            <button class="notif-toggle-btn" id="masterPopupBtn" onclick="toggleMasterPopups()">
+              🔔 BARRA: ON
+            </button>
+          </div>
+        </div>
+        <div id="dailyQuestsList"></div>
+      </div>
+
+      <!-- WEEKLY QUESTS (CRONOGRAMA SEMANAL: ACADEMIA / ESTUDO) -->
+      <div class="cyber-card purple">
+        <div class="card-header">
+          <div class="card-title">📅 Weekly Quests (+25 XP)</div>
+          <div class="card-actions">
+            <button class="icon-btn btn-reset" onclick="resetWeeklyQuestsNow()" title="Desmarcar todas as Weekly Quests para iniciar uma nova semana">
+              🔄 Resetar
+            </button>
+            <button class="icon-btn" style="border-color: var(--neon-purple); color: var(--neon-purple);" onclick="openQuestModal('weekly')">
+              ➕ Adicionar
+            </button>
+          </div>
+        </div>
+        <div id="weeklyQuestsList"></div>
+      </div>
+
+      <!-- BOSS FIGHTS PRÓXIMOS -->
+      <div class="cyber-card red">
+        <div class="card-header">
+          <div class="card-title">☠️ Boss Fights (+150 XP)</div>
+        </div>
+        <div id="bossQuestsList"></div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA 2: MISSÕES (ABERTAS + JÁ FEITAS) & PROJETOS ==================== -->
+    <section class="tab-view" id="tab-quests">
+      <div class="cyber-card">
+        <div class="card-header">
+          <div class="card-title">⚔️ Quadro de Missões (<span id="openQuestsCount">0 abertas</span>)</div>
+          <button class="icon-btn" onclick="openQuestModal('side')">➕ Nova</button>
+        </div>
+
+        <div class="filter-bar" id="questFilterBar">
+          <button class="filter-pill active" onclick="setQuestFilter('all')">🌐 Todas</button>
+          <button class="filter-pill" onclick="setQuestFilter('done')">✅ Concluídas</button>
+          <button class="filter-pill" onclick="setQuestFilter('daily')">🔁 Daily (10)</button>
+          <button class="filter-pill" onclick="setQuestFilter('weekly')">📅 Weekly (25)</button>
+          <button class="filter-pill" onclick="setQuestFilter('boss')">☠️ Boss (150)</button>
+          <button class="filter-pill" onclick="setQuestFilter('main')">⚔️ Main (50)</button>
+          <button class="filter-pill" onclick="setQuestFilter('side')">🧭 Side (30)</button>
+        </div>
+
+        <div id="allQuestsList"></div>
+      </div>
+
+      <!-- PROJETOS P&D COMPLETOS (RNA REATOR PWR & SOMA) -->
+      <div id="projectsContainer"></div>
+    </section>
+
+    <!-- ==================== ABA 3: SUAP & CLASSROOM (2026.2) ==================== -->
+    <section class="tab-view" id="tab-suap">
+      <div class="cyber-card yellow">
+        <div class="card-header">
+          <div class="card-title">🎓 Boletim & Frequência (2026.2)</div>
+          <button class="icon-btn" id="btnSyncSuapDirect" onclick="syncSuapAndClassroomDirect('suap')">
+            🔄 Sync SUAP
+          </button>
+        </div>
+        <div id="boletim2026List"></div>
+      </div>
+
+      <div class="cyber-card">
+        <div class="card-header">
+          <div class="card-title">📌 Entregas Google Classroom</div>
+          <div class="card-actions">
+            <span id="classroomCountTag" style="font-size: 0.68rem; color: var(--neon-cyan); font-weight: 800;">7 TURMAS</span>
+            <button class="icon-btn" id="btnSyncClassroomDirect" onclick="syncSuapAndClassroomDirect('classroom')">
+              🔄 Sync
+            </button>
+          </div>
+        </div>
+        <div id="classroomWorkList"></div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA 4: HISTÓRICO COMPLETO (ACADÊMICO + MISSÕES JÁ FEITAS) ==================== -->
+    <section class="tab-view" id="tab-historico">
+      <!-- CARGA HORÁRIA E TABELA DE REQUISITOS -->
+      <div class="cyber-card green">
+        <div class="card-header">
+          <div class="card-title">⏳ Progresso da Matriz Curricular (60,0%)</div>
+          <span style="font-size: 0.7rem; color: var(--neon-green); font-weight: 800;">CR: 9,0 · DEMO</span>
+        </div>
+        <div style="font-size: 0.8rem; margin-bottom: 8px; color: var(--text-muted);">
+          Cumprido: <strong style="color: var(--neon-green);">1.800h</strong> de <strong>3.000h</strong> previstas na matriz curricular de demonstração.
+        </div>
+        <div class="xp-bar-track" style="height: 12px; margin-bottom: 12px;">
+          <div class="xp-bar-fill" style="width: 60%; background: linear-gradient(90deg, #00ff9f, #00f0ff);"></div>
+        </div>
+        <div class="table-scroll">
+          <table class="cyber-table" id="requisitosTable"></table>
+        </div>
+      </div>
+
+      <!-- DISCIPLINAS CONCLUÍDAS + MATRIZ -->
+      <div class="cyber-card yellow">
+        <div class="card-header">
+          <div class="card-title">📜 Histórico de Disciplinas</div>
+          <span id="aprovadasCountTag" style="font-size: 0.7rem; color: var(--neon-yellow); font-weight: 800;">4 APROVADAS</span>
+        </div>
+        <div class="filter-bar" id="histPeriodFilterBar">
+          <button class="filter-pill active" onclick="setHistFilter('all')">Todas</button>
+          <button class="filter-pill" onclick="setHistFilter('1')">1º Per</button>
+          <button class="filter-pill" onclick="setHistFilter('2')">2º Per</button>
+          <button class="filter-pill" onclick="setHistFilter('3')">3º Per</button>
+          <button class="filter-pill" onclick="setHistFilter('4')">4º Per</button>
+          <button class="filter-pill" onclick="setHistFilter('pendentes')">🔮 Matriz</button>
+        </div>
+        <div id="historicoDisciplinasList"></div>
+      </div>
+
+      <!-- HISTÓRICO DE MISSÕES JÁ FEITAS (LOG DE XP DO RPG) -->
+      <div class="cyber-card purple">
+        <div class="card-header">
+          <div class="card-title">🏆 Histórico de Missões Concluídas</div>
+        </div>
+        <div id="completedLogList"></div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA 5: AJUSTES, PLUGINS NATIVOS, NOTIFICAÇÕES & CLASSES ==================== -->
+    <section class="tab-view" id="tab-config">
+      <!-- PLUGIN NATIVO SUAP & GOOGLE CLASSROOM EMBUTIDO NO APK -->
+      <div class="cyber-card yellow">
+        <div class="card-header">
+          <div class="card-title">🔌 Plugins: SUAP & Classroom</div>
+          <span id="pluginLastSyncBadge" style="font-size: 0.68rem; color: var(--neon-green); font-weight: 800;">ATIVO NO APP</span>
+        </div>
+        <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 10px;" id="pluginSyncStatusText">
+          Sincroniza notas, faltas, trabalhos e atividades direto pelo celular com o portal acadêmico (SUAP) e Google Sala de Aula, sem depender do PC!
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <button class="icon-btn" style="flex: 1; padding: 10px; border-color: var(--neon-green); color: var(--neon-green);" onclick="syncSuapAndClassroomDirect('both')">
+            ⚡ Sincronizar SUAP + Classroom Agora
+          </button>
+        </div>
+
+        <details style="margin-top: 6px;">
+          <summary style="cursor: pointer; font-size: 0.76rem; font-weight: 800; color: var(--neon-cyan); padding: 4px 0;">
+            🔑 Configurar Matrícula, Senha SUAP e Token/iCal Classroom
+          </summary>
+          <div style="margin-top: 10px;">
+            <div class="form-field">
+              <label>🪪 Matrícula SUAP:</label>
+              <input type="text" class="cyber-input" id="cfgSuapMatricula" placeholder="Digite sua matrícula" />
+            </div>
+            <div class="form-field">
+              <label>🔒 Senha SUAP:</label>
+              <input type="password" class="cyber-input" id="cfgSuapSenha" placeholder="Sua senha do SUAP" />
+            </div>
+            <div class="form-field">
+              <label>🎓 Token OAuth Google Classroom (Opcional):</label>
+              <input type="text" class="cyber-input" id="cfgClassroomToken" placeholder="ya29.a0..." />
+            </div>
+            <div class="form-field">
+              <label>📅 Link iCal (.ics) Google Sala de Aula (Nunca expira):</label>
+              <input type="text" class="cyber-input" id="cfgClassroomIcal" placeholder="https://calendar.google.com/calendar/ical/.../basic.ics" />
+            </div>
+            <button class="icon-btn" style="width: 100%; padding: 9px; border-color: var(--neon-yellow); color: var(--neon-yellow);" onclick="savePluginCredentials()">
+              💾 Salvar Credenciais no Celular
+            </button>
+          </div>
+        </details>
+      </div>
+
+      <div class="cyber-card green">
+        <div class="card-header">
+          <div class="card-title">🔔 Notificações na Barra do Android</div>
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <div style="font-weight: 800; font-size: 0.86rem;">Notificações na Barra (Chave Geral)</div>
+            <div style="font-size: 0.71rem; color: var(--text-muted);">Mostra as Daily Quests pendentes na barra superior com botão [✔ Concluir (+10 XP)]</div>
+          </div>
+          <div class="cyber-switch on" id="swMasterPopup" onclick="toggleMasterPopups()"></div>
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <div style="font-weight: 800; font-size: 0.86rem;">Atualizar Barra ao Abrir o App</div>
+            <div style="font-size: 0.71rem; color: var(--text-muted);">Sincroniza automaticamente as pendências na barra do celular ao entrar</div>
+          </div>
+          <div class="cyber-switch on" id="swBannerPopup" onclick="toggleNotifSetting('inAppPopupBanner')"></div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button class="icon-btn" style="flex: 1; padding: 9px;" onclick="requestAndroidNotificationPermission()">
+            ⚙️ Permissão do Android
+          </button>
+          <button class="icon-btn" style="flex: 1; padding: 9px; border-color: var(--neon-yellow); color: var(--neon-yellow);" onclick="triggerDailyPopupNow(true)">
+            📲 Atualizar Barra Agora
+          </button>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <div style="font-size: 0.72rem; font-weight: 800; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 4px;">
+            Chave Individual por Daily Quest:
+          </div>
+          <div id="individualDailySwitches"></div>
+        </div>
+      </div>
+
+      <!-- WIDGET DA TELA INICIAL DO ANDROID -->
+      <div class="cyber-card">
+        <div class="card-header">
+          <div class="card-title">📱 Widget de Quests (Tela Inicial)</div>
+          <span style="font-size: 0.68rem; color: var(--neon-cyan); font-weight: 800;">INTERATIVO</span>
+        </div>
+        <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 8px;">
+          Toque no botão abaixo para fixar o Widget direto na Tela Inicial do Android (ou segure o dedo na Tela Inicial → <strong>Widgets</strong> → <strong>Night City RPG</strong>).
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="icon-btn" style="flex: 1; padding: 9px; border-color: var(--neon-green); color: var(--neon-green);" onclick="pinWidgetToHomeScreen()">
+            📌 Fixar Widget na Tela Inicial
+          </button>
+          <button class="icon-btn" style="flex: 1; padding: 9px; border-color: var(--neon-cyan); color: var(--neon-cyan);" onclick="syncHomeWidget(true)">
+            🔄 Atualizar Dados
+          </button>
+        </div>
+      </div>
+
+      <!-- EVOLUÇÃO DE CLASSES -->
+      <div class="cyber-card purple">
+        <div class="card-header">
+          <div class="card-title">🧬 Árvore de Classes (Nível 1 → 100)</div>
+        </div>
+        <div id="classesTreeList"></div>
+      </div>
+
+      <!-- SINCRONIZAÇÃO OPCIONAL COM O PC -->
+      <div class="cyber-card yellow">
+        <div class="card-header">
+          <div class="card-title">🔄 Sincronizar com PC (Opcional)</div>
+          <span id="pendingSyncBadge" style="font-size: 0.68rem; color: var(--neon-yellow); font-weight: 800;">0 locais</span>
+        </div>
+        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+          <input type="text" class="cyber-input" id="inputPcServerUrl" value="http://localhost:8077" placeholder="http://IP-DO-PC:8077" />
+          <button class="icon-btn" style="border-color: var(--neon-green); color: var(--neon-green);" onclick="syncWithObsidianNow()">
+            Sync Wi-Fi
+          </button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button class="icon-btn" style="flex: 1; padding: 8px;" onclick="copyOfflineSyncPackage()">
+            📤 Copiar Backup JSON
+          </button>
+          <button class="icon-btn" style="flex: 1; padding: 8px;" onclick="clearPendingSyncQueue()">
+            🧹 Limpar Fila (<span id="pendingSyncCountBtn">0</span>)
+          </button>
+        </div>
+        <textarea class="cyber-input" id="offlineSyncBox" rows="2" style="margin-top: 8px; font-size: 0.7rem;" placeholder="Código JSON para exportar/importar..."></textarea>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTÃO FLUTUANTE NOVA QUEST -->
+  <button class="fab-add" onclick="openQuestModal('side')">➕ Quest</button>
+
+  <!-- MODAL CRIAR / EDITAR QUEST -->
+  <div class="modal-backdrop" id="questModal">
+    <div class="modal-card">
+      <h3 style="margin: 0 0 12px 0; color: var(--neon-yellow); font-size: 0.98rem; text-transform: uppercase;" id="modalHeaderTitle">
+        ➕ Nova Missão
+      </h3>
+
+      <div class="form-field">
+        <label>📌 Descrição da Missão / Tarefa:</label>
+        <input type="text" class="cyber-input" id="qInputTitle" placeholder="Ex: Treino A (Peito e Tríceps) / Estudar POO I..." />
+      </div>
+
+      <div class="form-field">
+        <label>⚔️ Categoria (XP e Ciclo):</label>
+        <select class="cyber-select" id="qSelectType">
+          <option value="daily">🔁 Daily Quest (+10 XP · Reseta todo dia)</option>
+          <option value="weekly">📅 Weekly Quest (+25 XP · Reseta toda semana)</option>
+          <option value="side" selected>🧭 Side Quest (+30 XP · Tarefa / Estudo)</option>
+          <option value="main">⚔️ Main Quest (+50 XP · Trabalho / Projeto)</option>
+          <option value="boss">☠️ Boss Fight (+150 XP · Prova / Entrega Final)</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>🧬 Atributo que vai subir:</label>
+        <select class="cyber-select" id="qSelectAttr">
+          <option value="INT">🧠 INT — Inteligência (Estudos, IA, Provas)</option>
+          <option value="TEC">🛠️ TEC — Técnica (Código, Projetos, Sistemas)</option>
+          <option value="COOL">😎 COOL — Sangue-Frio (Gestão, Organização)</option>
+          <option value="REF">⚡ REF — Reflexos (Entregas Rápidas)</option>
+          <option value="CORPO">💪 CORPO — Corpo (Academia, Treino, Saúde)</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>📅 Prazo ou Dia da Semana (Opcional):</label>
+        <input type="text" class="cyber-input" id="qInputDue" placeholder="Ex: Segunda e Quarta / 03/11" />
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-top: 14px;">
+        <button class="icon-btn" style="flex: 1; padding: 10px;" onclick="closeQuestModal()">Cancelar</button>
+        <button class="icon-btn" style="flex: 1; padding: 10px; border-color: var(--neon-yellow); color: var(--neon-yellow);" onclick="submitQuestModal()">
+          ⚡ Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE NAVEGAÇÃO INFERIOR (5 ABAS COMPLETAS) -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('hud', this)">
+      <span class="nav-ico">⚡</span>
+      <span>HUD & Daily</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('quests', this)">
+      <span class="nav-ico">⚔️</span>
+      <span>Missões</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('suap', this)">
+      <span class="nav-ico">🎓</span>
+      <span>SUAP 26.2</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('historico', this)">
+      <span class="nav-ico">📜</span>
+      <span>Histórico</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('config', this)">
+      <span class="nav-ico">⚙️</span>
+      <span>Ajustes</span>
+    </button>
+  </nav>
+
+  <!-- BANCO DE DADOS INICIAL EMBUTIDO NO APK STANDALONE -->
+  <script id="standalone-initial-data">window.STANDALONE_INITIAL_STATE = {"timestamp": "03/11/2026 09:42:39", "syncPluginSettings": {}, "player": {"name": "Netrunner V", "course": "Engenharia de Computação", "matricula": "", "ira": "9,0", "totalXP": 1450, "level": 10, "curXP": 190, "nextXP": 215, "xpPct": 88, "tier": {"min": 10, "name": "Netrunner Aprendiz", "rank": "Aprendiz", "game": "Cyberpunk 2077", "icon": "💾", "color": "#00f0ff", "quote": "Jack in. A Rede é sua nova sala de aula."}, "nextTier": {"min": 20, "name": "Hacker da DedSec", "rank": "Intermediário", "game": "Watch Dogs", "icon": "📱", "color": "#39ff14", "quote": "Todo sistema pode ser entendido... e hackeado."}, "tiers": [{"min": 1, "name": "Street Kid", "rank": "Iniciante", "game": "Cyberpunk 2077", "icon": "🛹", "color": "#f3e600", "quote": "Todo mundo começa nas ruas de Night City."}, {"min": 10, "name": "Netrunner Aprendiz", "rank": "Aprendiz", "game": "Cyberpunk 2077", "icon": "💾", "color": "#00f0ff", "quote": "Jack in. A Rede é sua nova sala de aula."}, {"min": 20, "name": "Hacker da DedSec", "rank": "Intermediário", "game": "Watch Dogs", "icon": "📱", "color": "#39ff14", "quote": "Todo sistema pode ser entendido... e hackeado."}, {"min": 30, "name": "Bruxo da Escola do Lobo", "rank": "Avançado", "game": "The Witcher 3", "icon": "🐺", "color": "#cfd8dc", "quote": "Monstros, contratos e provas: tudo tem um ponto fraco."}, {"min": 40, "name": "Cavaleiro de Hallownest", "rank": "Veterano", "game": "Hollow Knight", "icon": "🗡️", "color": "#8ab4ff", "quote": "Nenhum boss é impossível com paciência e prática."}, {"min": 50, "name": "Spartan-II", "rank": "Elite", "game": "Halo", "icon": "🪖", "color": "#7cb342", "quote": "Termine o que começou, Master Chief."}, {"min": 60, "name": "Dragonborn", "rank": "Mestre", "game": "The Elder Scrolls V: Skyrim", "icon": "🐉", "color": "#ff8c00", "quote": "FUS RO DAH nas pendências!"}, {"min": 70, "name": "Comandante N7", "rank": "Grão-Mestre", "game": "Mass Effect", "icon": "🚀", "color": "#ff3b3b", "quote": "Eu sou o Comandante Shepard, e esta é minha tarefa favorita."}, {"min": 80, "name": "Augmentado", "rank": "Lendário", "game": "Deus Ex", "icon": "🦾", "color": "#ffb000", "quote": "Eu nunca pedi por isso... mas aceitei o desafio."}, {"min": 90, "name": "Lenda de Night City", "rank": "Mítico", "game": "Cyberpunk 2077", "icon": "🌃", "color": "#ff003c", "quote": "Seu nome já é falado no Afterlife."}, {"min": 100, "name": "Rockerboy Imortal", "rank": "Ascendido", "game": "Cyberpunk 2077 — Johnny Silverhand", "icon": "🎸", "color": "#ff00ff", "quote": "Wake up, Samurai. Temos uma cidade para queimar."}], "tierIdx": 1, "tasksCompleted": 38, "bossesDefeated": 2, "streak": 7, "todayCount": 1, "attrs": {"INT": {"key": "INT", "name": "Inteligência", "icon": "🧠", "color": "#00f0ff", "desc": "Estudos, IA, modelagem matemática, provas e leituras", "xp": 780, "level": 6, "pct": 30}, "TEC": {"key": "TEC", "name": "Técnica", "icon": "🛠️", "color": "#f3e600", "desc": "Código Python/JS, projetos, arquitetura e sistemas", "xp": 920, "level": 7, "pct": 35}, "REF": {"key": "REF", "name": "Reflexos", "icon": "⚡", "color": "#ff003c", "desc": "Entregas rápidas e resolução ágil de pendências", "xp": 450, "level": 5, "pct": 25}, "COOL": {"key": "COOL", "name": "Sangue-Frio", "icon": "😎", "color": "#b388ff", "desc": "Gestão de projetos, planejamento e organização", "xp": 410, "level": 5, "pct": 25}, "CORPO": {"key": "CORPO", "name": "Corpo", "icon": "💪", "color": "#39ff14", "desc": "Saúde, treino físico, hidratação e bem-estar", "xp": 400, "level": 5, "pct": 25}}, "log": [{"ts": 1793706159699, "text": "Estruturar diagrama de classes UML do módulo principal", "xp": 30, "type": "side", "attr": "TEC"}, {"ts": 1793702559699, "text": "Revisão semanal de sprint e limpeza de notas", "xp": 25, "type": "weekly", "attr": "COOL"}, {"ts": 1793698959699, "text": "Organizar backlog e metas prioritárias do dia", "xp": 10, "type": "daily", "attr": "COOL"}]}, "notifications": {"masterEnabled": true, "inAppPopupBanner": true, "persistentHudNotification": true, "soundEffects": true, "reminderTimes": ["09:00", "14:00", "20:00"], "bossAlertEnabled": true, "disabledQuestKeys": {}}, "lastMobileDailyReset": "2026-11-03", "lastMobileWeeklyReset": "2026-11-02", "dailyQuests": [{"id": "revisar_algoritmos_e_estruturas_de_dados_30_min", "key": "demo::daily::1", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 10, "rawText": "Revisar algoritmos e estruturas de dados (30 min) #daily #int", "clean": "Revisar algoritmos e estruturas de dados (30 min)", "completed": false, "type": "daily", "typeLabel": "DAILY", "typeIcon": "🔁", "xp": 10, "attr": "INT", "attrIcon": "🧠", "attrName": "Inteligência", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "commit_diario_e_revisao_de_codigo_no_git", "key": "demo::daily::2", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 11, "rawText": "Commit diário e revisão de código no Git #daily #tec", "clean": "Commit diário e revisão de código no Git", "completed": false, "type": "daily", "typeLabel": "DAILY", "typeIcon": "🔁", "xp": 10, "attr": "TEC", "attrIcon": "🛠️", "attrName": "Técnica", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "leitura_de_documentacao_ou_artigo_tecnico", "key": "demo::daily::3", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 12, "rawText": "Leitura de documentação ou artigo técnico #daily #int", "clean": "Leitura de documentação ou artigo técnico", "completed": false, "type": "daily", "typeLabel": "DAILY", "typeIcon": "🔁", "xp": 10, "attr": "INT", "attrIcon": "🧠", "attrName": "Inteligência", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "sessao_de_treino_fisico_mobilidade_e_hidratacao_2l", "key": "demo::daily::4", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 13, "rawText": "Sessão de treino físico / mobilidade e hidratação (2L) #daily #corpo", "clean": "Sessão de treino físico / mobilidade e hidratação (2L)", "completed": false, "type": "daily", "typeLabel": "DAILY", "typeIcon": "🔁", "xp": 10, "attr": "CORPO", "attrIcon": "💪", "attrName": "Corpo", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "organizar_backlog_e_metas_prioritarias_do_dia", "key": "demo::daily::5", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 14, "rawText": "Organizar backlog e metas prioritárias do dia #daily #cool", "clean": "Organizar backlog e metas prioritárias do dia", "completed": true, "type": "daily", "typeLabel": "DAILY", "typeIcon": "🔁", "xp": 10, "attr": "COOL", "attrIcon": "😎", "attrName": "Sangue-Frio", "popupEnabled": true, "individualPopupEnabled": true}], "weeklyQuests": [{"id": "treino_a_membros_superiores_e_core", "key": "demo::weekly::1", "file": "02 - Rotina & Diário/📅 Planejamento Semanal.md", "noteName": "Planejamento Semanal", "line": 40, "rawText": "Treino A — Membros Superiores e Core (Segunda/Quinta) #weekly #corpo", "clean": "Treino A — Membros Superiores e Core (Segunda/Quinta)", "completed": false, "type": "weekly", "typeLabel": "WEEKLY", "typeIcon": "📅", "xp": 25, "attr": "CORPO", "attrIcon": "💪", "attrName": "Corpo", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "treino_b_membros_inferiores_e_cardio", "key": "demo::weekly::2", "file": "02 - Rotina & Diário/📅 Planejamento Semanal.md", "noteName": "Planejamento Semanal", "line": 41, "rawText": "Treino B — Membros Inferiores e Cardio (Terça/Sexta) #weekly #corpo", "clean": "Treino B — Membros Inferiores e Cardio (Terça/Sexta)", "completed": false, "type": "weekly", "typeLabel": "WEEKLY", "typeIcon": "📅", "xp": 25, "attr": "CORPO", "attrIcon": "💪", "attrName": "Corpo", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "revisao_semanal_de_sprint_e_limpeza_de_notas", "key": "demo::weekly::3", "file": "02 - Rotina & Diário/📅 Planejamento Semanal.md", "noteName": "Planejamento Semanal", "line": 42, "rawText": "Revisão semanal de sprint e limpeza de notas #weekly #cool", "clean": "Revisão semanal de sprint e limpeza de notas", "completed": true, "type": "weekly", "typeLabel": "WEEKLY", "typeIcon": "📅", "xp": 25, "attr": "COOL", "attrIcon": "😎", "attrName": "Sangue-Frio", "popupEnabled": true, "individualPopupEnabled": true}], "quests": [{"id": "derrotar_avaliacao_final_de_arquitetura_de_sistemas", "key": "demo::boss::1", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 20, "rawText": "Derrotar Avaliação Final de Arquitetura de Sistemas (Prazo: Sexta) #boss #int", "clean": "Derrotar Avaliação Final de Arquitetura de Sistemas (Prazo: Sexta)", "completed": false, "type": "boss", "typeLabel": "BOSS", "typeIcon": "☠️", "xp": 150, "attr": "INT", "attrIcon": "🧠", "attrName": "Inteligência", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "entrega_e_defesa_do_prototipo_de_engenharia_de_software", "key": "demo::boss::2", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 21, "rawText": "Entrega e Defesa do Protótipo de Engenharia de Software #boss #tec", "clean": "Entrega e Defesa do Protótipo de Engenharia de Software", "completed": false, "type": "boss", "typeLabel": "BOSS", "typeIcon": "☠️", "xp": 150, "attr": "TEC", "attrIcon": "🛠️", "attrName": "Técnica", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "implementar_autenticacao_jwt_e_rotas_rest_no_backend", "key": "demo::main::1", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 25, "rawText": "Implementar autenticação JWT e rotas REST no backend #main #tec", "clean": "Implementar autenticação JWT e rotas REST no backend", "completed": false, "type": "main", "typeLabel": "MAIN", "typeIcon": "⚔️", "xp": 50, "attr": "TEC", "attrIcon": "🛠️", "attrName": "Técnica", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "redigir_relatorio_tecnico_de_modelagem_e_simulacao", "key": "demo::main::2", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 26, "rawText": "Redigir relatório técnico de modelagem e simulação #main #int", "clean": "Redigir relatório técnico de modelagem e simulação", "completed": false, "type": "main", "typeLabel": "MAIN", "typeIcon": "⚔️", "xp": 50, "attr": "INT", "attrIcon": "🧠", "attrName": "Inteligência", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "resolver_lista_de_exercicios_de_calculo_numerico", "key": "demo::side::1", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 30, "rawText": "Resolver lista de exercícios de Cálculo Numérico #side #int", "clean": "Resolver lista de exercícios de Cálculo Numérico", "completed": false, "type": "side", "typeLabel": "SIDE", "typeIcon": "🧭", "xp": 30, "attr": "INT", "attrIcon": "🧠", "attrName": "Inteligência", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "configurar_pipeline_de_linting_e_formatacao_automatica", "key": "demo::side::2", "file": "00 - Início/🎮 Central de Quests.md", "noteName": "Central de Quests", "line": 31, "rawText": "Configurar pipeline de linting e formatação automática #side #ref", "clean": "Configurar pipeline de linting e formatação automática", "completed": false, "type": "side", "typeLabel": "SIDE", "typeIcon": "🧭", "xp": 30, "attr": "REF", "attrIcon": "⚡", "attrName": "Reflexos", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "treino_a_membros_superiores_e_core", "key": "demo::weekly::1", "file": "02 - Rotina & Diário/📅 Planejamento Semanal.md", "noteName": "Planejamento Semanal", "line": 40, "rawText": "Treino A — Membros Superiores e Core (Segunda/Quinta) #weekly #corpo", "clean": "Treino A — Membros Superiores e Core (Segunda/Quinta)", "completed": false, "type": "weekly", "typeLabel": "WEEKLY", "typeIcon": "📅", "xp": 25, "attr": "CORPO", "attrIcon": "💪", "attrName": "Corpo", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "treino_b_membros_inferiores_e_cardio", "key": "demo::weekly::2", "file": "02 - Rotina & Diário/📅 Planejamento Semanal.md", "noteName": "Planejamento Semanal", "line": 41, "rawText": "Treino B — Membros Inferiores e Cardio (Terça/Sexta) #weekly #corpo", "clean": "Treino B — Membros Inferiores e Cardio (Terça/Sexta)", "completed": false, "type": "weekly", "typeLabel": "WEEKLY", "typeIcon": "📅", "xp": 25, "attr": "CORPO", "attrIcon": "💪", "attrName": "Corpo", "popupEnabled": true, "individualPopupEnabled": true}, {"id": "revisao_semanal_de_sprint_e_limpeza_de_notas", "key": "demo::weekly::3", "file": "02 - Rotina & Diário/📅 Planejamento Semanal.md", "noteName": "Planejamento Semanal", "line": 42, "rawText": "Revisão semanal de sprint e limpeza de notas #weekly #cool", "clean": "Revisão semanal de sprint e limpeza de notas", "completed": true, "type": "weekly", "typeLabel": "WEEKLY", "typeIcon": "📅", "xp": 25, "attr": "COOL", "attrIcon": "😎", "attrName": "Sangue-Frio", "popupEnabled": true, "individualPopupEnabled": true}], "academic": {"boletimWeb": [{"diario": "101", "disciplina": "ENG01 - Engenharia de Software", "chAulas": "60", "aulasDadas": "40", "faltas": "2", "frequencia": "97%", "situacao": "Cursando", "e1Nota": "N1: 9.2", "e2Nota": "-"}, {"diario": "102", "disciplina": "IA02 - Inteligência Artificial", "chAulas": "60", "aulasDadas": "38", "faltas": "0", "frequencia": "100%", "situacao": "Cursando", "e1Nota": "N1: 9.5", "e2Nota": "-"}, {"diario": "103", "disciplina": "CALC03 - Cálculo Numérico Computacional", "chAulas": "60", "aulasDadas": "42", "faltas": "2", "frequencia": "97%", "situacao": "Cursando", "e1Nota": "N1: 8.8", "e2Nota": "-"}, {"diario": "104", "disciplina": "ARQ04 - Arquitetura de Sistemas", "chAulas": "60", "aulasDadas": "36", "faltas": "0", "frequencia": "100%", "situacao": "Cursando", "e1Nota": "N1: 9.0", "e2Nota": "-"}], "requisitos": [{"requisito": "Disciplinas Obrigatórias", "prevista": 2400, "cumprida": 1500, "pendente": "900h"}, {"requisito": "Disciplinas Optativas", "prevista": 300, "cumprida": 180, "pendente": "120h"}, {"requisito": "Atividades Complementares", "prevista": 300, "cumprida": 120, "pendente": "180h"}], "historicoItens": [{"codigo": "ALG01", "disciplina": "Algoritmos e Estruturas de Dados", "periodoCurso": 1, "anoLetivo": "Semestre 1", "chTexto": "80", "notaTexto": "9.4", "frequencia": "98%", "situacao": "Aprovado"}, {"codigo": "POO02", "disciplina": "Programação Orientada a Objetos", "periodoCurso": 2, "anoLetivo": "Semestre 2", "chTexto": "80", "notaTexto": "9.1", "frequencia": "100%", "situacao": "Aprovado"}, {"codigo": "BD03", "disciplina": "Banco de Dados Relacionais", "periodoCurso": 3, "anoLetivo": "Semestre 3", "chTexto": "60", "notaTexto": "8.9", "frequencia": "96%", "situacao": "Aprovado"}, {"codigo": "RED04", "disciplina": "Redes de Computadores e Protocolos", "periodoCurso": 4, "anoLetivo": "Semestre 4", "chTexto": "60", "notaTexto": "9.0", "frequencia": "100%", "situacao": "Aprovado"}, {"codigo": "SO05", "disciplina": "Sistemas Operacionais", "periodoCurso": 5, "anoLetivo": "Semestre 5", "chTexto": "60", "notaTexto": "-", "frequencia": "-", "situacao": "-"}]}, "classroom": {"coursesCount": 4, "pendingWork": [{"id": "cw1", "courseName": "Inteligência Artificial", "title": "Implementação de Rede Neural MLP em Python", "dueDate": "Sexta-feira", "alternateLink": "", "isTurnedIn": false}, {"id": "cw2", "courseName": "Engenharia de Software", "title": "Modelagem de Arquitetura e Diagrama C4", "dueDate": "Próxima Semana", "alternateLink": "", "isTurnedIn": false}], "completedWork": [], "announcements": []}, "projects": [{"id": "neural-core", "code": "PROJETO 01 // IA & SIMULAÇÃO", "title": "🤖 NeuralCore — Monitoramento Preditivo com Redes Neurais", "status": "🟢 Em Desenvolvimento Ativo (Validação Cruzada & Fine-Tuning)", "color": "#f3e600", "summary": "Pipeline de aprendizado profundo (MLP) para reconstrução espacial de sinais e detecção de anomalias operacionais em tempo real.", "specs": ["Arquitetura: Rede Perceptron Multicamadas com ativação tanh/linear", "Transfer Learning: Congelamento de camadas base e ajuste fino com Adam (lr=1e-4)", "Validação Estatística: Leave-One-Out (LOO) e métricas MAE, RMSE e R²"], "notePath": "01 - Projetos & Trabalhos/🤖 Projeto NeuralCore.md"}, {"id": "nexus-hub", "code": "PROJETO 02 // FULL-STACK & GESTÃO", "title": "🌐 NexusHub — Plataforma Colaborativa de Pesquisa & Dev", "status": "🟡 Arquitetura de Software & Prototipação MVP", "color": "#00f0ff", "summary": "Aplicação web e mobile para integração de equipes técnicas, gestão de tarefas gamificadas e acompanhamento de metas de engenharia.", "specs": ["Sincronização bidirecional offline-first via JSON e API REST", "Dashboard responsivo com telemetria de produtividade e streaks", "Integração modular com agendas (.ics) e cofres Markdown"], "notePath": "01 - Projetos & Trabalhos/🌐 Projeto NexusHub.md"}]};</script>
+  <script>
+    const CACHE_KEY = "nc_rpg_cached_state_v2084";
+    let APP_STATE = null;
+    let CURRENT_QUEST_FILTER = "all";
+    let CURRENT_HIST_FILTER = "all";
+    let EDITING_QUEST = null;
+    let PENDING_SYNC_ACTIONS = [];
+
+    try {
+      PENDING_SYNC_ACTIONS = JSON.parse(localStorage.getItem("nc_rpg_pending_actions") || "[]");
+    } catch (e) {
+      PENDING_SYNC_ACTIONS = [];
+    }
+
+    function getCurrentDayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function getCurrentWeekMondayKey() {
+      const d = new Date();
+      const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const day = dt.getDay();
+      const diff = (day === 0 ? -6 : 1) - day;
+      dt.setDate(dt.getDate() + diff);
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+    }
+
+    // Reseta automaticamente as Daily Quests a cada novo dia e as Weekly Quests a cada nova segunda-feira
+    function checkMobileDailyAndWeeklyResets() {
+      if (!APP_STATE) return;
+      let changed = false;
+      const todayKey = getCurrentDayKey();
+      const weekKey = getCurrentWeekMondayKey();
+
+      const savedDay = localStorage.getItem("nc_rpg_last_daily_date") || APP_STATE.lastMobileDailyReset || "";
+      if (savedDay && savedDay !== todayKey) {
+        for (const q of APP_STATE.dailyQuests || []) {
+          if (q.completed) {
+            q.completed = false;
+            changed = true;
+          }
+        }
+      }
+      localStorage.setItem("nc_rpg_last_daily_date", todayKey);
+      APP_STATE.lastMobileDailyReset = todayKey;
+
+      const savedWeek = localStorage.getItem("nc_rpg_last_weekly_date") || APP_STATE.lastMobileWeeklyReset || "";
+      if (savedWeek && savedWeek !== weekKey) {
+        for (const q of APP_STATE.weeklyQuests || []) {
+          if (q.completed) {
+            q.completed = false;
+            changed = true;
+          }
+        }
+        for (const q of APP_STATE.quests || []) {
+          if (q.type === "weekly" && q.completed) {
+            q.completed = false;
+            changed = true;
+          }
+        }
+      }
+      localStorage.setItem("nc_rpg_last_weekly_date", weekKey);
+      APP_STATE.lastMobileWeeklyReset = weekKey;
+
+      if (changed) {
+        saveLocalState();
+        renderAll();
+        syncAndroidSystemNotifications();
+      }
+    }
+
+    function resetDailyQuestsNow() {
+      if (!APP_STATE) return;
+      let count = 0;
+      for (const q of APP_STATE.dailyQuests || []) {
+        if (q.completed) {
+          q.completed = false;
+          count++;
+        }
+      }
+      localStorage.setItem("nc_rpg_last_daily_date", getCurrentDayKey());
+      saveLocalState();
+      renderAll();
+      syncAndroidSystemNotifications();
+      showToast(count > 0 ? `🔄 ${count} Daily Quests resetadas para hoje!` : "🔄 Todas as Daily Quests já estão abertas!");
+    }
+
+    function resetWeeklyQuestsNow() {
+      if (!APP_STATE) return;
+      let count = 0;
+      for (const q of APP_STATE.weeklyQuests || []) {
+        if (q.completed) {
+          q.completed = false;
+          count++;
+        }
+      }
+      for (const q of APP_STATE.quests || []) {
+        if (q.type === "weekly" && q.completed) {
+          q.completed = false;
+          count++;
+        }
+      }
+      localStorage.setItem("nc_rpg_last_weekly_date", getCurrentWeekMondayKey());
+      saveLocalState();
+      renderAll();
+      showToast(count > 0 ? `🔄 ${count} Weekly Quests resetadas para a semana!` : "🔄 Todas as Weekly Quests já estão abertas!");
+    }
+
+    function saveLocalState() {
+      if (!APP_STATE) return;
+      localStorage.setItem(CACHE_KEY, JSON.stringify(APP_STATE));
+      localStorage.setItem("nc_rpg_pending_actions", JSON.stringify(PENDING_SYNC_ACTIONS));
+      updatePendingSyncUI();
+    }
+
+    function queuePendingAction(act) {
+      PENDING_SYNC_ACTIONS.push(Object.assign({ ts: Date.now() }, act));
+      saveLocalState();
+    }
+
+    function updatePendingSyncUI() {
+      const count = PENDING_SYNC_ACTIONS.length;
+      const badge = document.getElementById("pendingSyncBadge");
+      const btnCnt = document.getElementById("pendingSyncCountBtn");
+      const box = document.getElementById("offlineSyncBox");
+      if (badge) badge.textContent = `${count} locais`;
+      if (btnCnt) btnCnt.textContent = String(count);
+      if (box && count > 0) {
+        box.value = JSON.stringify({ pendingActions: PENDING_SYNC_ACTIONS }, null, 2);
+      }
+    }
+
+    function recalculateLocalPlayerStats() {
+      if (!APP_STATE || !APP_STATE.player) return;
+      const p = APP_STATE.player;
+      const tiers = p.tiers || [];
+      let totalXP = p.totalXP || 520;
+      let curLvl = 1;
+      let rem = totalXP;
+      const needFor = (L) => 80 + (L - 1) * 15;
+      while (curLvl < 999 && rem >= needFor(curLvl)) {
+        rem -= needFor(curLvl);
+        curLvl++;
+      }
+      const nextNeed = needFor(curLvl);
+      p.level = curLvl;
+      p.curXP = rem;
+      p.nextXP = nextNeed;
+      p.xpPct = Math.min(100, Math.round((rem / Math.max(1, nextNeed)) * 100));
+      let tIdx = 0;
+      for (let i = 0; i < tiers.length; i++) {
+        if (curLvl >= tiers[i].min) tIdx = i;
+      }
+      p.tierIdx = tIdx;
+      if (tiers[tIdx]) p.tier = tiers[tIdx];
+      if (tiers[tIdx + 1]) p.nextTier = tiers[tIdx + 1];
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("xpToast");
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        el.style.display = "none";
+      }, 2800);
+    }
+
+    function switchTab(tabId, btnEl) {
+      document.querySelectorAll(".tab-view").forEach((s) => s.classList.remove("active"));
+      document.getElementById("tab-" + tabId).classList.add("active");
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function fetchState(showInitialPopup = false) {
+      const savedUrl = localStorage.getItem("nc_pc_server_url");
+      if (savedUrl && document.getElementById("inputPcServerUrl")) {
+        document.getElementById("inputPcServerUrl").value = savedUrl;
+      }
+
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          APP_STATE = JSON.parse(cached);
+        } catch (e) {}
+      }
+      if (!APP_STATE && window.STANDALONE_INITIAL_STATE) {
+        APP_STATE = JSON.parse(JSON.stringify(window.STANDALONE_INITIAL_STATE));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(APP_STATE));
+      }
+
+      if (APP_STATE) {
+        if (!Array.isArray(APP_STATE.weeklyQuests)) APP_STATE.weeklyQuests = [];
+        checkMobileDailyAndWeeklyResets();
+        renderAll();
+        updatePendingSyncUI();
+        // Processa primeiro as ações feitas pelo Widget/Notificação (app fechado)
+        // e só depois libera a sincronização da fila do Widget (evita a quest "voltar").
+        window.consumeNativeNotificationActions();
+        WIDGET_SYNC_READY = true;
+        syncHomeWidget(false);
+        if (showInitialPopup) maybeShowInitialDailyPopup();
+      }
+
+      if (location.protocol.startsWith("http")) {
+        try {
+          const res = await fetch("/api/state");
+          const data = await res.json();
+          APP_STATE = data;
+          saveLocalState();
+          renderAll();
+        } catch (e) {}
+      }
+    }
+
+    function renderAll() {
+      if (!APP_STATE) return;
+      const p = APP_STATE.player;
+      const notif = APP_STATE.notifications || {};
+
+      // Topbar & HUD Compacta
+      document.getElementById("topClassSub").textContent = `Nível ${p.level} · ${p.tier.name} (${p.curXP}/${p.nextXP} XP)`;
+      document.getElementById("hudAvatar").textContent = p.tier.icon;
+      document.getElementById("hudPlayerName").textContent = p.name;
+      document.getElementById("hudClassName").textContent = `${p.tier.name} · ${p.tier.game}`;
+      document.getElementById("hudLevelNum").textContent = p.level;
+      document.getElementById("hudXpText").textContent = `XP ${p.curXP} / ${p.nextXP}`;
+      document.getElementById("hudXpRemain").textContent = `faltam ${p.nextXP - p.curXP} XP p/ Nível ${p.level + 1}`;
+      document.getElementById("hudXpFill").style.width = `${p.xpPct}%`;
+
+      document.getElementById("statTotalXp").textContent = `💠 ${p.totalXP}`;
+      document.getElementById("statTasks").textContent = `✅ ${p.tasksCompleted}`;
+      document.getElementById("statStreak").textContent = `🔥 ${p.streak}d`;
+      document.getElementById("statIra").textContent = `🎓 ${p.ira}`;
+
+      // Grade compacta de 5 atributos em linha única
+      const attrsBox = document.getElementById("hudAttrsContainer");
+      attrsBox.innerHTML = Object.values(p.attrs)
+        .map(
+          (a) => `
+        <div class="attr-chip" style="border-bottom-color:${a.color};">
+          <span class="attr-chip-key">${a.icon} ${a.key}</span>
+          <span class="attr-chip-val" style="color:${a.color};">Lv ${a.level}</span>
+        </div>`
+        )
+        .join("");
+
+      // Botão Master Barra
+      const masterBtn = document.getElementById("masterPopupBtn");
+      if (notif.masterEnabled) {
+        masterBtn.textContent = "🔔 BARRA: ON";
+        masterBtn.classList.remove("off");
+      } else {
+        masterBtn.textContent = "🔕 BARRA: OFF";
+        masterBtn.classList.add("off");
+      }
+
+      // Daily Quests
+      const dailies = APP_STATE.dailyQuests || [];
+      const dailyListEl = document.getElementById("dailyQuestsList");
+      dailyListEl.innerHTML = dailies
+        .map((q) => {
+          return `
+          <div class="quest-item type-daily ${q.completed ? "done" : ""}">
+            <div class="quest-check" onclick="toggleQuest('${escapeJs(q.clean)}', '${escapeJs(q.file)}', ${q.line}, ${!q.completed}, ${q.xp})">
+              ${q.completed ? "✔" : ""}
+            </div>
+            <div class="quest-body">
+              <div class="quest-title">${escapeHtml(q.clean)}</div>
+              <div class="quest-sub">
+                <span class="xp-tag">+${q.xp} XP</span>
+                <span>${q.attrIcon} ${q.attr}</span>
+              </div>
+            </div>
+            <button class="notif-toggle-btn ${q.individualPopupEnabled ? "" : "off"}"
+              onclick="toggleQuestPopup('${escapeJs(q.id)}', ${!q.individualPopupEnabled})"
+              title="Ativar/Desativar notificação desta Daily Quest">
+              ${q.individualPopupEnabled ? "🔔" : "🔕"}
+            </button>
+          </div>`;
+        })
+        .join("");
+
+      // Weekly Quests
+      const weeklies = (APP_STATE.quests || []).filter((q) => q.type === "weekly");
+      const weeklyListEl = document.getElementById("weeklyQuestsList");
+      if (weeklyListEl) {
+        weeklyListEl.innerHTML = weeklies.length
+          ? weeklies.map((q) => renderQuestRow(q, true)).join("")
+          : `<div style="font-size:0.76rem; color:var(--text-muted); padding:4px 2px;">Nenhuma Weekly Quest cadastrada. Toque em <strong>➕ Adicionar</strong> para montar seu cronograma semanal de academia ou estudo.</div>`;
+      }
+
+      // Boss Fights
+      const bosses = (APP_STATE.quests || []).filter((q) => q.type === "boss" && !q.completed);
+      const bossListEl = document.getElementById("bossQuestsList");
+      bossListEl.innerHTML = bosses.length
+        ? bosses.map((q) => renderQuestRow(q, false)).join("")
+        : `<div style="font-size:0.78rem; color:var(--text-muted);">Nenhum Boss pendente no momento.</div>`;
+
+      // Aba 2: Quadro Geral de Missões (Abertas + Concluídas)
+      const combinedQuests = [...dailies, ...(APP_STATE.quests || [])];
+      const filteredQuests = combinedQuests.filter((q) => {
+        if (CURRENT_QUEST_FILTER === "all") return true;
+        if (CURRENT_QUEST_FILTER === "done") return Boolean(q.completed);
+        return q.type === CURRENT_QUEST_FILTER;
+      });
+      const openCount = combinedQuests.filter((q) => !q.completed).length;
+      const doneCount = combinedQuests.filter((q) => q.completed).length;
+      document.getElementById("openQuestsCount").textContent = `${openCount} abertas · ${doneCount} feitas`;
+      document.getElementById("allQuestsList").innerHTML = filteredQuests.length
+        ? filteredQuests.map((q) => renderQuestRow(q, true)).join("")
+        : `<div style="font-size:0.78rem; color:var(--text-muted); padding:6px 0;">Nenhuma missão neste filtro.</div>`;
+
+      // Projetos P&D (RNA PWR e SOMA)
+      const projEl = document.getElementById("projectsContainer");
+      projEl.innerHTML = (APP_STATE.projects || [])
+        .map(
+          (pr) => `
+        <div class="cyber-card" style="border-left-color:${pr.color};">
+          <div class="card-title" style="color:${pr.color}; margin-bottom:4px;">${pr.title}</div>
+          <div style="font-size:0.72rem; color:var(--neon-green); font-weight:700; margin-bottom:6px;">${pr.status}</div>
+          <div style="font-size:0.78rem; margin-bottom:8px;">${pr.summary}</div>
+          <ul style="margin:0; padding-left:18px; font-size:0.74rem; color:var(--text-muted);">
+            ${(pr.specs || []).map((s) => `<li style="margin-bottom:4px;">${s}</li>`).join("")}
+          </ul>
+        </div>`
+        )
+        .join("");
+
+      // Aba 3: SUAP 2026.2 & Classroom
+      const acad = APP_STATE.academic || {};
+      const bol = acad.boletimWeb || [];
+      const bolEl = document.getElementById("boletim2026List");
+      bolEl.innerHTML = bol
+        .map((b) => {
+          const totalAulas = parseInt(b.chAulas) || 60;
+          const maxFaltas = Math.floor(totalAulas * 0.25);
+          const faltas = parseInt(b.faltas) || 0;
+          const rest = Math.max(0, maxFaltas - faltas);
+          return `
+          <div class="quest-item" style="flex-direction:column; align-items:stretch; gap:4px;">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.84rem;">
+              <span>📘 ${escapeHtml(b.disciplina)}</span>
+              <span style="color:var(--neon-cyan);">${b.frequencia}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.71rem; color:var(--text-muted);">
+              <span>Aulas dadas: ${b.aulasDadas}/${b.chAulas}</span>
+              <span>Faltas: <strong style="color:${faltas > 0 ? "var(--neon-yellow)" : "var(--neon-green)"};">${faltas}</strong> (Pode faltar: ${rest}/${maxFaltas})</span>
+              <span>N1: ${b.e1Nota} · N2: ${b.e2Nota}</span>
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      const cr = APP_STATE.classroom || {};
+      document.getElementById("classroomCountTag").textContent = `${cr.coursesCount || 7} TURMAS`;
+      const crEl = document.getElementById("classroomWorkList");
+      crEl.innerHTML = (cr.pendingWork || [])
+        .slice(0, 12)
+        .map(
+          (w) => `
+        <div class="quest-item type-side">
+          <div class="quest-body">
+            <div class="quest-title">[${escapeHtml(w.courseName)}] ${escapeHtml(w.title)}</div>
+            <div class="quest-sub">
+              <span>📅 Prazo: ${w.dueDate || "Sem data"}</span>
+              ${w.alternateLink ? `<a href="${w.alternateLink}" target="_blank" style="color:var(--neon-cyan);">🔗 Abrir Classroom</a>` : ""}
+            </div>
+          </div>
+        </div>`
+        )
+        .join("");
+
+      // Aba 4: Histórico Acadêmico & Log de Missões Feitas
+      const reqs = acad.requisitos || [];
+      document.getElementById("requisitosTable").innerHTML = `
+        <thead>
+          <tr><th>Requisito</th><th>Previsto</th><th>Cumprido</th><th>Pendente</th></tr>
+        </thead>
+        <tbody>
+          ${reqs
+            .map(
+              (r) => `
+            <tr>
+              <td><strong>${escapeHtml(r.requisito)}</strong></td>
+              <td>${r.prevista}h</td>
+              <td style="color:var(--neon-green); font-weight:800;">${r.cumprida}h</td>
+              <td>${r.pendente}</td>
+            </tr>`
+            )
+            .join("")}
+        </tbody>`;
+
+      const histItens = acad.historicoItens || [];
+      const aprovadas = histItens.filter((x) => (x.situacao || "").toLowerCase().includes("aprovado"));
+      const pendentesMatriz = histItens.filter((x) => !x.situacao || x.situacao === "-");
+      document.getElementById("aprovadasCountTag").textContent = `${aprovadas.length} APROVADAS (100%)`;
+
+      let listToRender = aprovadas;
+      if (CURRENT_HIST_FILTER === "pendentes") {
+        listToRender = pendentesMatriz;
+      } else if (CURRENT_HIST_FILTER !== "all") {
+        listToRender = aprovadas.filter((x) => String(x.periodoCurso) === CURRENT_HIST_FILTER);
+      }
+
+      document.getElementById("historicoDisciplinasList").innerHTML = listToRender
+        .map(
+          (x) => `
+        <div class="quest-item" style="border-left-color:${x.situacao === "Aprovado" ? "var(--neon-green)" : "var(--neon-orange)"};">
+          <div class="quest-body">
+            <div class="quest-title">${escapeHtml(x.disciplina)} <span style="color:var(--text-muted); font-size:0.74rem;">(${x.codigo})</span></div>
+            <div class="quest-sub">
+              <span>${x.periodoCurso}º Período (${x.anoLetivo})</span>
+              <span>CH: ${x.chTexto}h</span>
+              ${x.notaTexto && x.notaTexto !== "-" ? `<span style="color:var(--neon-yellow); font-weight:900;">Nota: ${x.notaTexto}</span>` : ""}
+              ${x.frequencia && x.frequencia !== "-" ? `<span>Freq: ${x.frequencia}</span>` : ""}
+              <span style="color:${x.situacao === "Aprovado" ? "var(--neon-green)" : "var(--neon-orange)"}; font-weight:800;">
+                ${x.situacao === "Aprovado" ? "✅ Aprovado" : "⏳ Matriz"}
+              </span>
+            </div>
+          </div>
+        </div>`
+        )
+        .join("");
+
+      // Log de Missões Já Feitas (XP)
+      const logs = p.log || [];
+      const logEl = document.getElementById("completedLogList");
+      if (logEl) {
+        logEl.innerHTML = logs.length
+          ? logs
+              .map(
+                (lg) => `
+              <div class="quest-item done" style="opacity:0.85;">
+                <div class="quest-check">✔</div>
+                <div class="quest-body">
+                  <div class="quest-title" style="text-decoration:none; color:var(--text-main);">${escapeHtml(lg.text)}</div>
+                  <div class="quest-sub">
+                    <span class="xp-tag">${lg.xp >= 0 ? "+" + lg.xp : lg.xp} XP</span>
+                    ${lg.attr ? `<span>🧬 ${lg.attr}</span>` : ""}
+                  </div>
+                </div>
+              </div>`
+              )
+              .join("")
+          : `<div style="font-size:0.78rem; color:var(--text-muted);">Nenhuma missão registrada no histórico ainda.</div>`;
+      }
+
+      // Aba 5: Ajustes, Plugins SUAP/Classroom & Classes
+      const syncCfg = getPluginCredentials();
+      const elMat = document.getElementById("cfgSuapMatricula");
+      const elSen = document.getElementById("cfgSuapSenha");
+      const elTok = document.getElementById("cfgClassroomToken");
+      const elIcal = document.getElementById("cfgClassroomIcal");
+      const elBadge = document.getElementById("pluginLastSyncBadge");
+      if (elMat && !elMat.dataset.touched) elMat.value = syncCfg.suapMatricula || "";
+      if (elSen && !elSen.dataset.touched) elSen.value = syncCfg.suapSenha || "";
+      if (elTok && !elTok.dataset.touched) elTok.value = syncCfg.classroomAccessToken || "";
+      if (elIcal && !elIcal.dataset.touched) elIcal.value = syncCfg.classroomIcalUrl || "";
+      if (elBadge && syncCfg.lastSync) elBadge.textContent = syncCfg.lastSync;
+
+      document.getElementById("swMasterPopup").classList.toggle("on", Boolean(notif.masterEnabled));
+      document.getElementById("swBannerPopup").classList.toggle("on", Boolean(notif.inAppPopupBanner));
+
+      document.getElementById("individualDailySwitches").innerHTML = dailies
+        .map(
+          (q) => `
+        <div class="switch-row">
+          <div style="font-size:0.8rem; font-weight:700;">${escapeHtml(q.clean)}</div>
+          <div class="cyber-switch ${q.individualPopupEnabled ? "on" : ""}"
+               onclick="toggleQuestPopup('${escapeJs(q.id)}', ${!q.individualPopupEnabled})"></div>
+        </div>`
+        )
+        .join("");
+
+      document.getElementById("classesTreeList").innerHTML = (p.tiers || [])
+        .map((t, idx) => {
+          const unlocked = idx <= p.tierIdx;
+          const current = idx === p.tierIdx;
+          return `
+          <div class="quest-item" style="border-left-color:${t.color}; opacity:${unlocked ? "1" : "0.4"}; ${current ? "background:rgba(252,238,10,0.08);" : ""}">
+            <div style="font-size:1.35rem;">${unlocked ? t.icon : "🔒"}</div>
+            <div class="quest-body">
+              <div class="quest-title" style="color:${t.color};">${t.name} — ${t.rank}${current ? " (ATUAL)" : ""}</div>
+              <div class="quest-sub">
+                <span>Nível ${t.min}+</span>
+                <span>🎮 ${t.game}</span>
+              </div>
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      syncHomeWidget(false);
+    }
+
+    // Só sincroniza o Widget depois de consumir as ações pendentes do Widget/Notificação
+    var WIDGET_SYNC_READY = WIDGET_SYNC_READY || false;
+
+    function widgetQuestId(q) {
+      return String(q.id || q.clean || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9_]+/g, "_")
+        .slice(0, 64);
+    }
+
+    function syncHomeWidget(showFeedback = false) {
+      if (!APP_STATE) return;
+      if (!WIDGET_SYNC_READY && !showFeedback) return;
+      const p = APP_STATE.player || {};
+      const dailies = APP_STATE.dailyQuests || [];
+      const dailiesOpen = dailies.filter((q) => !q.completed);
+      const dailiesDone = dailies.length - dailiesOpen.length;
+      // Ordem do Widget: Dailies → Weeklies → Boss → Main → Side
+      const typeOrder = { weekly: 0, boss: 1, main: 2, side: 3, comum: 4 };
+      const othersOpen = (APP_STATE.quests || [])
+        .filter((q) => !q.completed && q.type !== "daily")
+        .sort((a, b) => (typeOrder[a.type] ?? 9) - (typeOrder[b.type] ?? 9));
+      const allOpen = [...dailiesOpen, ...othersOpen];
+
+      const tierIcon = (p.tier && p.tier.icon) || "🛹";
+      const headerTitle = `⚡ LV ${p.level || 1} · ${p.totalXP || 0} XP`;
+      const headerSub = `${tierIcon} 🔥 ${p.streak || 0}d · 🔁 ${dailiesDone}/${dailies.length} dailies · ${allOpen.length} na fila`;
+
+      const lines = allOpen.slice(0, 30).map((q) => {
+        const badge = `${q.typeIcon || "🔁"} ${q.typeLabel || "DAILY"} +${q.xp || 10} XP · ${q.attrIcon || "🧠"} ${q.attr || "INT"}`;
+        const cleanTitle = String(q.clean || "").replace(/[\r\n\t]+/g, " ").trim();
+        return `${widgetQuestId(q)}\t${badge}\t${cleanTitle}\t${Number(q.xp || 10)}`;
+      });
+
+      if (window.AndroidBridge && window.AndroidBridge.syncWidgetData) {
+        try {
+          window.AndroidBridge.syncWidgetData(headerTitle, headerSub, lines.join("\n"));
+          if (showFeedback) {
+            showToast(`📱 Widget atualizado (${allOpen.length} missões na fila)!`);
+          }
+        } catch (e) {}
+      } else if (showFeedback) {
+        showToast("📱 Widget ativo no APK instalado no celular!");
+      }
+    }
+
+    function pinWidgetToHomeScreen() {
+      syncHomeWidget(false);
+      if (window.AndroidBridge && window.AndroidBridge.requestPinWidget) {
+        try {
+          window.AndroidBridge.requestPinWidget();
+          return;
+        } catch (e) {}
+      }
+      showToast("📱 Segure o dedo na Tela Inicial → Widgets → Night City RPG!");
+    }
+
+    function renderQuestRow(q, showManageBtns = false) {
+      return `
+        <div class="quest-item type-${q.type} ${q.completed ? "done" : ""}">
+          <div class="quest-check" onclick="toggleQuest('${escapeJs(q.clean)}', '${escapeJs(q.file)}', ${q.line}, ${!q.completed}, ${q.xp})">
+            ${q.completed ? "✔" : ""}
+          </div>
+          <div class="quest-body">
+            <div class="quest-title">${escapeHtml(q.clean)}</div>
+            <div class="quest-sub">
+              <span>${q.typeIcon} ${q.typeLabel}</span>
+              <span class="xp-tag">+${q.xp} XP</span>
+              <span>${q.attrIcon} ${q.attr}</span>
+            </div>
+          </div>
+          ${
+            showManageBtns
+              ? `<button class="mini-act-btn" onclick='openEditQuestModal(${JSON.stringify(q).replace(/'/g, "&#39;")})' title="Editar">✏️</button>
+                 <button class="mini-act-btn" onclick="deleteQuest('${escapeJs(q.file)}', ${q.line}, '${escapeJs(q.clean)}')" title="Excluir">🗑️</button>`
+              : ""
+          }
+        </div>`;
+    }
+
+    async function toggleQuest(clean, file, line, completed, xp) {
+      if (!APP_STATE) return;
+      const allLists = [APP_STATE.dailyQuests || [], APP_STATE.weeklyQuests || [], APP_STATE.quests || []];
+      let matchedAttr = "INT";
+      for (const lst of allLists) {
+        for (const q of lst) {
+          if ((q.file === file && q.line === line) || q.clean === clean) {
+            q.completed = completed;
+            q.touchedOffline = true;
+            matchedAttr = q.attr || "INT";
+          }
+        }
+      }
+      const delta = completed ? Number(xp || 10) : -Number(xp || 10);
+      APP_STATE.player.totalXP = Math.max(0, (APP_STATE.player.totalXP || 0) + delta);
+      APP_STATE.player.tasksCompleted = Math.max(0, (APP_STATE.player.tasksCompleted || 0) + (completed ? 1 : -1));
+      if (completed) {
+        APP_STATE.player.log = APP_STATE.player.log || [];
+        APP_STATE.player.log.unshift({ ts: Date.now(), text: clean, xp: Number(xp || 10), attr: matchedAttr });
+      }
+      if (APP_STATE.player.attrs && APP_STATE.player.attrs[matchedAttr]) {
+        const atObj = APP_STATE.player.attrs[matchedAttr];
+        atObj.xp = Math.max(0, (atObj.xp || 0) + delta);
+        atObj.level = Math.min(20, 1 + Math.floor(Math.sqrt(atObj.xp / 25)));
+        atObj.pct = Math.round((atObj.level / 20) * 100);
+      }
+      recalculateLocalPlayerStats();
+      queuePendingAction({ kind: "toggle", clean, file, line, completed, xp });
+      renderAll();
+      syncAndroidSystemNotifications();
+      showToast(completed ? `⚡ +${xp} XP (${matchedAttr})` : `↩️ -${xp} XP · Reaberta`);
+
+      if (location.protocol.startsWith("http")) {
+        try {
+          const res = await fetch("/api/quest/toggle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clean, file, line, completed })
+          });
+          const data = await res.json();
+          if (data.state) {
+            APP_STATE = data.state;
+            PENDING_SYNC_ACTIONS = [];
+            saveLocalState();
+            renderAll();
+          }
+        } catch (e) {}
+      }
+    }
+
+    async function toggleMasterPopups() {
+      if (!APP_STATE) return;
+      const nextVal = !APP_STATE.notifications.masterEnabled;
+      APP_STATE.notifications.masterEnabled = nextVal;
+      for (const q of APP_STATE.dailyQuests || []) {
+        q.popupEnabled = nextVal && q.individualPopupEnabled;
+      }
+      saveLocalState();
+      renderAll();
+      syncAndroidSystemNotifications();
+      showToast(nextVal ? "🔔 Notificações na barra ATIVADAS!" : "🔕 Notificações na barra DESATIVADAS!");
+    }
+
+    async function toggleNotifSetting(field) {
+      if (!APP_STATE) return;
+      APP_STATE.notifications[field] = !APP_STATE.notifications[field];
+      saveLocalState();
+      renderAll();
+      syncAndroidSystemNotifications();
+      showToast("⚙️ Ajuste salvo!");
+    }
+
+    async function toggleQuestPopup(questId, enabled) {
+      if (!APP_STATE) return;
+      if (!APP_STATE.notifications.disabledQuestKeys) APP_STATE.notifications.disabledQuestKeys = {};
+      if (enabled) {
+        delete APP_STATE.notifications.disabledQuestKeys[questId];
+      } else {
+        APP_STATE.notifications.disabledQuestKeys[questId] = true;
+      }
+      for (const q of APP_STATE.dailyQuests || []) {
+        if (q.id === questId) {
+          q.individualPopupEnabled = enabled;
+          q.popupEnabled = APP_STATE.notifications.masterEnabled && enabled;
+        }
+      }
+      saveLocalState();
+      renderAll();
+      syncAndroidSystemNotifications();
+      showToast(enabled ? "🔔 Notificação ativada" : "🔕 Notificação silenciada");
+    }
+
+    // ---------------- NOTIFICAÇÕES NATIVAS DO ANDROID ----------------
+    function getQuestNotifId(questId) {
+      let hash = 0;
+      const s = String(questId || "");
+      for (let i = 0; i < s.length; i++) {
+        hash = (hash * 31 + s.charCodeAt(i)) & 0x7fffffff;
+      }
+      return 2000 + (hash % 50000);
+    }
+
+    function syncAndroidSystemNotifications() {
+      if (!APP_STATE || !window.AndroidBridge) return;
+      if (window.AndroidBridge.areNotificationsEnabled && !window.AndroidBridge.areNotificationsEnabled()) {
+        return;
+      }
+      const notif = APP_STATE.notifications || {};
+      if (!notif.masterEnabled) {
+        if (window.AndroidBridge.cancelAllNotifications) {
+          try { window.AndroidBridge.cancelAllNotifications(); } catch (e) {}
+        }
+        return;
+      }
+
+      const dailies = APP_STATE.dailyQuests || [];
+      for (const q of dailies) {
+        const nid = getQuestNotifId(q.id);
+        if (!q.completed && q.individualPopupEnabled) {
+          if (window.AndroidBridge.showQuestNotification) {
+            try {
+              window.AndroidBridge.showQuestNotification(
+                q.id,
+                `⚡ Daily Quest [+${q.xp} XP · ${q.attrIcon} ${q.attr}]`,
+                q.clean,
+                nid
+              );
+            } catch (e) {}
+          }
+        } else {
+          if (window.AndroidBridge.cancelNotification) {
+            try { window.AndroidBridge.cancelNotification(nid); } catch (e) {}
+          }
+        }
+      }
+    }
+
+    window.consumeNativeNotificationActions = function () {
+      if (!window.AndroidBridge || !window.AndroidBridge.consumeNativeActions || !APP_STATE) return;
+      try {
+        const raw = window.AndroidBridge.consumeNativeActions();
+        if (!raw) return;
+        const lines = String(raw).split("\n").map((x) => x.trim()).filter(Boolean);
+        const allPools = [
+          ...(APP_STATE.dailyQuests || []),
+          ...(APP_STATE.weeklyQuests || []),
+          ...(APP_STATE.quests || [])
+        ];
+        for (const item of lines) {
+          const sep = item.indexOf(":");
+          if (sep === -1) continue;
+          const action = item.slice(0, sep);
+          const questId = item.slice(sep + 1);
+          const matches = allPools.filter((q) => q.id === questId || widgetQuestId(q) === questId);
+          const target = matches.find((q) => !q.completed) || matches[0];
+          if (!target) continue;
+          if (action === "complete" && !target.completed) {
+            toggleQuest(target.clean, target.file, target.line, true, target.xp);
+          } else if (action === "mute") {
+            toggleQuestPopup(target.id, false);
+          }
+        }
+        if (lines.length) syncHomeWidget(false);
+      } catch (e) {}
+    };
+
+    function maybeShowInitialDailyPopup() {
+      window.consumeNativeNotificationActions();
+      if (!APP_STATE || !APP_STATE.notifications) return;
+      if (APP_STATE.notifications.masterEnabled && APP_STATE.notifications.inAppPopupBanner) {
+        syncAndroidSystemNotifications();
+      }
+    }
+
+    function triggerDailyPopupNow(alsoNative = true) {
+      if (!APP_STATE) return;
+      if (window.AndroidBridge && window.AndroidBridge.areNotificationsEnabled && !window.AndroidBridge.areNotificationsEnabled()) {
+        if (window.AndroidBridge.openNotificationSettings) {
+          window.AndroidBridge.openNotificationSettings();
+        }
+        return;
+      }
+      const pending = (APP_STATE.dailyQuests || []).filter((q) => !q.completed && q.individualPopupEnabled);
+      if (!pending.length) {
+        showToast("✅ Todas as Daily Quests ativas já foram concluídas hoje!");
+        if (window.AndroidBridge && window.AndroidBridge.cancelAllNotifications) {
+          try { window.AndroidBridge.cancelAllNotifications(); } catch (e) {}
+        }
+        return;
+      }
+      syncAndroidSystemNotifications();
+      showToast(`📲 ${pending.length} Daily Quests na barra do Android!`);
+    }
+
+    async function requestAndroidNotificationPermission() {
+      if (window.AndroidBridge) {
+        if (window.AndroidBridge.openNotificationSettings) {
+          window.AndroidBridge.openNotificationSettings();
+        }
+        return;
+      }
+      showToast("ℹ️ Ajuste disponível no APK Android");
+    }
+
+    setInterval(() => {
+      window.consumeNativeNotificationActions();
+    }, 2500);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        checkMobileDailyAndWeeklyResets();
+        window.consumeNativeNotificationActions();
+      }
+    });
+
+    // ---------------- FILTROS & MODAIS ----------------
+    function setQuestFilter(f) {
+      CURRENT_QUEST_FILTER = f;
+      document.querySelectorAll("#questFilterBar .filter-pill").forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("onclick").includes(`'${f}'`));
+      });
+      renderAll();
+    }
+
+    function setHistFilter(f) {
+      CURRENT_HIST_FILTER = f;
+      document.querySelectorAll("#histPeriodFilterBar .filter-pill").forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("onclick").includes(`'${f}'`));
+      });
+      renderAll();
+    }
+
+    function openQuestModal(defaultType = "side") {
+      EDITING_QUEST = null;
+      document.getElementById("modalHeaderTitle").textContent =
+        defaultType === "weekly" ? "📅 Nova Weekly Quest" : "➕ Nova Missão";
+      document.getElementById("qInputTitle").value = "";
+      document.getElementById("qInputDue").value = "";
+      document.getElementById("qSelectType").value = defaultType || "side";
+      document.getElementById("qSelectAttr").value = defaultType === "weekly" ? "CORPO" : "INT";
+      document.getElementById("questModal").classList.add("open");
+    }
+
+    function openEditQuestModal(q) {
+      EDITING_QUEST = q;
+      document.getElementById("modalHeaderTitle").textContent = "✏️ Editar Missão";
+      document.getElementById("qInputTitle").value = q.clean;
+      document.getElementById("qInputDue").value = "";
+      document.getElementById("qSelectType").value = q.type === "comum" ? "side" : q.type;
+      document.getElementById("qSelectAttr").value = q.attr || "INT";
+      document.getElementById("questModal").classList.add("open");
+    }
+
+    function closeQuestModal() {
+      document.getElementById("questModal").classList.remove("open");
+    }
+
+    async function submitQuestModal() {
+      const title = document.getElementById("qInputTitle").value.trim();
+      const due = document.getElementById("qInputDue").value.trim();
+      const type = document.getElementById("qSelectType").value;
+      const attr = document.getElementById("qSelectAttr").value;
+
+      if (!title) {
+        showToast("⚠️ Digite a descrição da missão!");
+        return;
+      }
+
+      const xpMap = { daily: 10, weekly: 25, side: 30, main: 50, boss: 150 };
+      const iconMap = { daily: "🔁", weekly: "📅", side: "🧭", main: "⚔️", boss: "☠️" };
+      const labelMap = { daily: "DAILY", weekly: "WEEKLY", side: "SIDE", main: "MAIN", boss: "BOSS" };
+      const attrIcons = { INT: "🧠", TEC: "🛠️", COOL: "😎", REF: "⚡", CORPO: "💪" };
+      const attrNames = { INT: "Inteligência", TEC: "Técnica", COOL: "Sangue-Frio", REF: "Reflexos", CORPO: "Corpo" };
+      const cleanStr = due ? `${title} (${due})` : title;
+      const qId = cleanStr.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 64);
+
+      if (EDITING_QUEST) {
+        const oldClean = EDITING_QUEST.clean;
+        EDITING_QUEST.clean = cleanStr;
+        EDITING_QUEST.type = type;
+        EDITING_QUEST.typeIcon = iconMap[type] || "🧭";
+        EDITING_QUEST.typeLabel = labelMap[type] || "SIDE";
+        EDITING_QUEST.xp = xpMap[type] || 30;
+        EDITING_QUEST.attr = attr;
+        EDITING_QUEST.attrIcon = attrIcons[attr] || "🧠";
+        EDITING_QUEST.attrName = attrNames[attr] || "Inteligência";
+        queuePendingAction({
+          kind: "update",
+          file: EDITING_QUEST.file,
+          line: EDITING_QUEST.line,
+          oldClean,
+          title,
+          due,
+          type,
+          attr
+        });
+        showToast("✅ Missão atualizada!");
+      } else {
+        const newObj = {
+          id: qId,
+          key: `mobile::${qId}::${Date.now()}`,
+          file: "00 - Início/🎮 Central de Quests.md",
+          noteName: "Central de Quests",
+          line: -1,
+          rawText: cleanStr,
+          clean: cleanStr,
+          completed: false,
+          type,
+          typeLabel: labelMap[type] || "SIDE",
+          typeIcon: iconMap[type] || "🧭",
+          xp: xpMap[type] || 30,
+          attr,
+          attrIcon: attrIcons[attr] || "🧠",
+          attrName: attrNames[attr] || "Inteligência",
+          popupEnabled: APP_STATE.notifications.masterEnabled,
+          individualPopupEnabled: true
+        };
+        if (type === "daily") {
+          APP_STATE.dailyQuests.unshift(newObj);
+        } else {
+          if (type === "weekly") {
+            if (!Array.isArray(APP_STATE.weeklyQuests)) APP_STATE.weeklyQuests = [];
+            APP_STATE.weeklyQuests.unshift(newObj);
+          }
+          APP_STATE.quests.unshift(newObj);
+        }
+        queuePendingAction({ kind: "create", title, due, type, attr, dest: "both", popupEnabled: true });
+        showToast(`⚡ Missão criada (+${newObj.xp} XP)!`);
+      }
+
+      saveLocalState();
+      closeQuestModal();
+      renderAll();
+      syncAndroidSystemNotifications();
+    }
+
+    async function deleteQuest(file, line, oldClean) {
+      if (!APP_STATE) return;
+      APP_STATE.dailyQuests = (APP_STATE.dailyQuests || []).filter((q) => q.clean !== oldClean);
+      APP_STATE.weeklyQuests = (APP_STATE.weeklyQuests || []).filter((q) => q.clean !== oldClean);
+      APP_STATE.quests = (APP_STATE.quests || []).filter((q) => q.clean !== oldClean);
+      queuePendingAction({ kind: "delete", file, line, oldClean });
+      saveLocalState();
+      renderAll();
+      syncAndroidSystemNotifications();
+      showToast("🗑️ Missão removida!");
+    }
+
+    // ---------------- PLUGINS EMBUTIDOS NO APK: SINCRONIZADOR NATIVO SUAP & GOOGLE CLASSROOM ----------------
+    function getPluginCredentials() {
+      const base = (APP_STATE && APP_STATE.syncPluginSettings) || {};
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem("nc_rpg_plugin_creds") || "{}");
+      } catch (e) {}
+      return Object.assign(
+        {
+          suapBaseUrl: "https://suap.iff.edu.br",
+          suapMatricula: "",
+          suapSenha: "",
+          suapAccessToken: "",
+          classroomAccessToken: "",
+          classroomIcalUrl: "",
+          lastSync: "Pronto"
+        },
+        base,
+        saved
+      );
+    }
+
+    function savePluginCredentials() {
+      const cfg = getPluginCredentials();
+      cfg.suapMatricula = (document.getElementById("cfgSuapMatricula").value || "").trim();
+      cfg.suapSenha = document.getElementById("cfgSuapSenha").value || "";
+      cfg.classroomAccessToken = (document.getElementById("cfgClassroomToken").value || "").trim();
+      cfg.classroomIcalUrl = (document.getElementById("cfgClassroomIcal").value || "").trim();
+      localStorage.setItem("nc_rpg_plugin_creds", JSON.stringify(cfg));
+      if (APP_STATE) {
+        APP_STATE.syncPluginSettings = cfg;
+        saveLocalState();
+      }
+      showToast("💾 Credenciais do SUAP e Classroom salvas no celular!");
+    }
+
+    async function nativeHttpRequest(url, method = "GET", authHeader = "", bodyObj = null) {
+      const bodyStr = bodyObj ? JSON.stringify(bodyObj) : "";
+      if (window.AndroidBridge && window.AndroidBridge.httpRequest) {
+        const raw = window.AndroidBridge.httpRequest(url, method, authHeader || "", bodyStr);
+        if (!raw) throw new Error("Sem resposta de " + url);
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          return raw;
+        }
+      }
+      const headers = { Accept: "application/json, text/calendar, */*" };
+      if (authHeader) headers["Authorization"] = authHeader;
+      if (bodyObj) headers["Content-Type"] = "application/json";
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: bodyObj ? bodyStr : undefined
+      });
+      const txt = await res.text();
+      try {
+        return JSON.parse(txt);
+      } catch (e) {
+        return txt;
+      }
+    }
+
+    function formatEtapaNota(etapas, numEtapa) {
+      for (const et of etapas || []) {
+        if (Number(et.numero_etapa) === Number(numEtapa)) {
+          const avs = et.avaliacoes || [];
+          if (!avs.length) return "-";
+          const validas = avs.filter((a) => a.nota !== null && a.nota !== undefined && a.nota !== "");
+          if (!validas.length) return "-";
+          return validas.map((a) => `${a.sigla || "N"}: ${a.nota}`).join(", ");
+        }
+      }
+      return "-";
+    }
+
+    function addAutoSyncedQuestIfMissing(titleText, qType, qAttr, noteLabel) {
+      if (!APP_STATE) return false;
+      const cleanStr = String(titleText || "").replace(/\s+/g, " ").trim();
+      if (!cleanStr) return false;
+      const qId = cleanStr.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 64);
+      const exists = (APP_STATE.quests || []).some((q) => q.id === qId || q.clean.toLowerCase() === cleanStr.toLowerCase());
+      if (exists) return false;
+
+      const xpMap = { daily: 10, weekly: 25, side: 30, main: 50, boss: 150 };
+      const iconMap = { daily: "🔁", weekly: "📅", side: "🧭", main: "⚔️", boss: "☠️" };
+      const labelMap = { daily: "DAILY", weekly: "WEEKLY", side: "SIDE", main: "MAIN", boss: "BOSS" };
+      const attrIcons = { INT: "🧠", TEC: "🛠️", COOL: "😎", REF: "⚡", CORPO: "💪" };
+      const attrNames = { INT: "Inteligência", TEC: "Técnica", COOL: "Sangue-Frio", REF: "Reflexos", CORPO: "Corpo" };
+
+      APP_STATE.quests.unshift({
+        id: qId,
+        key: `autosync::${qId}`,
+        file: "01 - Projetos & Trabalhos/🎓 Trabalhos da Faculdade (IFF).md",
+        noteName: noteLabel || "SUAP / Classroom",
+        line: -1,
+        rawText: cleanStr,
+        clean: cleanStr,
+        completed: false,
+        type: qType,
+        typeLabel: labelMap[qType] || "SIDE",
+        typeIcon: iconMap[qType] || "🧭",
+        xp: xpMap[qType] || 30,
+        attr: qAttr,
+        attrIcon: attrIcons[qAttr] || "🧠",
+        attrName: attrNames[qAttr] || "Inteligência",
+        popupEnabled: false,
+        individualPopupEnabled: false
+      });
+      return true;
+    }
+
+    async function runStandaloneSuapSync(cfg) {
+      const baseUrl = (cfg.suapBaseUrl || "https://suap.iff.edu.br").replace(/\/+$/, "");
+      let token = cfg.suapAccessToken || "";
+
+      // 1. Faz login JWT direto no SUAP pelo celular para renovar o token
+      if (cfg.suapMatricula && cfg.suapSenha) {
+        const endpoints = ["/api/token/pair", "/api/v2/autenticacao/token/"];
+        for (const ep of endpoints) {
+          try {
+            const authRes = await nativeHttpRequest(`${baseUrl}${ep}`, "POST", "", {
+              username: cfg.suapMatricula.trim(),
+              password: cfg.suapSenha
+            });
+            if (authRes && authRes.access) {
+              token = authRes.access;
+              cfg.suapAccessToken = token;
+              break;
+            }
+          } catch (e) {}
+        }
+      }
+
+      if (!token) {
+        throw new Error("Informe sua Matrícula e Senha do SUAP nas configurações!");
+      }
+
+      const authHeader = `Bearer ${token}`;
+      const extractList = (p) => (Array.isArray(p) ? p : p && Array.isArray(p.results) ? p.results : []);
+
+      const diarios = extractList(await nativeHttpRequest(`${baseUrl}/api/ensino/diarios/2026.2`, "GET", authHeader));
+      const turmas = extractList(await nativeHttpRequest(`${baseUrl}/api/ensino/minhas-turmas-virtuais/2026/2/`, "GET", authHeader));
+      const proxAv = extractList(await nativeHttpRequest(`${baseUrl}/api/ensino/minhas-proximas-avaliacoes/`, "GET", authHeader));
+
+      if (!diarios.length && !turmas.length) {
+        throw new Error("Não foi possível ler os diários de 2026.2 do SUAP.");
+      }
+
+      const mapBySigla = {};
+      for (const d of diarios) {
+        const sigla = (d.disciplina && d.disciplina.sigla) || d.sigla || `ID-${d.id}`;
+        const nome = (d.disciplina && d.disciplina.descricao) || d.descricao || sigla;
+        mapBySigla[sigla] = {
+          sigla,
+          nome,
+          idDiario: d.id,
+          idTurmaVirtual: null,
+          chAulas: 60,
+          aulasDadas: 0,
+          faltas: 0,
+          e1Nota: "-",
+          e2Nota: "-"
+        };
+      }
+
+      for (const tv of turmas) {
+        const sigla = tv.sigla || `TV-${tv.id}`;
+        if (!mapBySigla[sigla]) {
+          mapBySigla[sigla] = {
+            sigla,
+            nome: tv.descricao || sigla,
+            idDiario: null,
+            idTurmaVirtual: tv.id,
+            chAulas: 60,
+            aulasDadas: 0,
+            faltas: 0,
+            e1Nota: "-",
+            e2Nota: "-"
+          };
+        } else {
+          mapBySigla[sigla].idTurmaVirtual = tv.id;
+        }
+      }
+
+      const updatedBoletim = [];
+      let newQuestsAdded = 0;
+
+      for (const entry of Object.values(mapBySigla)) {
+        if (entry.idTurmaVirtual) {
+          try {
+            const det = await nativeHttpRequest(
+              `${baseUrl}/api/ensino/minha-turma-virtual/${entry.idTurmaVirtual}/`,
+              "GET",
+              authHeader
+            );
+            if (det && typeof det === "object") {
+              const comp = String(det.componente_curricular || "");
+              const mCh = comp.match(/\/\s*(\d+)\s*Aulas\]/i);
+              if (mCh) entry.chAulas = parseInt(mCh[1], 10) || 60;
+              if (Array.isArray(det.aulas)) {
+                entry.aulasDadas = det.aulas.reduce((acc, a) => acc + (Number(a.quantidade) || 0), 0);
+                entry.faltas = det.aulas.reduce((acc, a) => acc + (Number(a.faltas) || 0), 0);
+              }
+            }
+          } catch (e) {}
+
+          try {
+            const trabs = extractList(
+              await nativeHttpRequest(`${baseUrl}/api/ensino/diarios/${entry.idTurmaVirtual}/trabalhos`, "GET", authHeader)
+            );
+            for (const t of trabs) {
+              const tTitle = `[SUAP - ${entry.nome}] Trabalho: ${t.titulo || " Entrega"}`;
+              if (addAutoSyncedQuestIfMissing(tTitle, "main", "TEC", "SUAP")) newQuestsAdded++;
+            }
+          } catch (e) {}
+        }
+
+        if (entry.idDiario) {
+          try {
+            const etapas = extractList(
+              await nativeHttpRequest(`${baseUrl}/api/ensino/disciplinas/${entry.idDiario}/etapas/`, "GET", authHeader)
+            );
+            entry.e1Nota = formatEtapaNota(etapas, 1);
+            entry.e2Nota = formatEtapaNota(etapas, 2);
+          } catch (e) {}
+        }
+
+        const pctFreq = entry.chAulas > 0 ? Math.max(0, Math.round(((entry.chAulas - entry.faltas) / entry.chAulas) * 100)) : 100;
+        updatedBoletim.push({
+          diario: String(entry.idDiario || entry.idTurmaVirtual || ""),
+          disciplina: `${entry.sigla} - ${entry.nome}`,
+          chAulas: String(entry.chAulas),
+          aulasDadas: String(entry.aulasDadas),
+          faltas: String(entry.faltas),
+          frequencia: `${pctFreq}%`,
+          situacao: "Cursando",
+          e1Nota: entry.e1Nota,
+          e2Nota: entry.e2Nota
+        });
+      }
+
+      for (const av of proxAv) {
+        const avDesc = av.descricao || av.sigla || "Avaliação";
+        const avDisc = (av.diario && av.diario.disciplina && av.diario.disciplina.descricao) || "IFF";
+        const avData = av.data ? ` (${av.data})` : "";
+        if (addAutoSyncedQuestIfMissing(`Derrotar ${avDesc} de ${avDisc}${avData}`, "boss", "INT", "SUAP")) {
+          newQuestsAdded++;
+        }
+      }
+
+      updatedBoletim.sort((a, b) => a.disciplina.localeCompare(b.disciplina, "pt-BR"));
+      if (!APP_STATE.academic) APP_STATE.academic = {};
+      if (updatedBoletim.length > 0) {
+        APP_STATE.academic.boletimWeb = updatedBoletim;
+      }
+
+      return { count: updatedBoletim.length, newQuestsAdded };
+    }
+
+    function parseIcalText(icsText) {
+      const events = [];
+      const blocks = String(icsText || "").split("BEGIN:VEVENT").slice(1);
+      for (const b of blocks) {
+        const endBlock = b.split("END:VEVENT")[0];
+        const getField = (name) => {
+          const rx = new RegExp(`^${name}(?:;[^:]*)?:(.*)$`, "m");
+          const m = endBlock.match(rx);
+          return m ? m[1].trim() : "";
+        };
+        const summary = getField("SUMMARY");
+        const dtstart = getField("DTSTART");
+        if (!summary) continue;
+        let dueDate = "";
+        if (dtstart && dtstart.length >= 8) {
+          dueDate = `${dtstart.slice(6, 8)}/${dtstart.slice(4, 6)}/${dtstart.slice(0, 4)}`;
+        }
+        events.push({
+          id: getField("UID") || summary,
+          courseName: "Google Classroom",
+          title: summary,
+          dueDate,
+          alternateLink: "",
+          isTurnedIn: false
+        });
+      }
+      return events;
+    }
+
+    async function runStandaloneClassroomSync(cfg) {
+      let pendingWork = [];
+      let coursesCount = (APP_STATE.classroom && APP_STATE.classroom.coursesCount) || 7;
+      let newQuestsAdded = 0;
+
+      if (cfg.classroomAccessToken) {
+        const authHeader = `Bearer ${cfg.classroomAccessToken.trim()}`;
+        const coursesRes = await nativeHttpRequest(
+          "https://classroom.googleapis.com/v1/courses?courseStates=ACTIVE&pageSize=30",
+          "GET",
+          authHeader
+        );
+        if (coursesRes && Array.isArray(coursesRes.courses)) {
+          const courses = coursesRes.courses;
+          coursesCount = courses.length;
+          for (const c of courses) {
+            try {
+              const cwRes = await nativeHttpRequest(
+                `https://classroom.googleapis.com/v1/courses/${c.id}/courseWork?pageSize=20`,
+                "GET",
+                authHeader
+              );
+              const works = (cwRes && cwRes.courseWork) || [];
+              const subsMap = {};
+              try {
+                const subRes = await nativeHttpRequest(
+                  `https://classroom.googleapis.com/v1/courses/${c.id}/courseWork/-/studentSubmissions?userId=me&pageSize=40`,
+                  "GET",
+                  authHeader
+                );
+                for (const s of (subRes && subRes.studentSubmissions) || []) {
+                  subsMap[s.courseWorkId] = s;
+                }
+              } catch (e) {}
+
+              for (const w of works) {
+                const sub = subsMap[w.id] || {};
+                const state = sub.state || "CREATED";
+                const isTurnedIn = state === "TURNED_IN" || state === "RETURNED";
+                let dueStr = "";
+                if (w.dueDate && w.dueDate.year) {
+                  dueStr = `${String(w.dueDate.day || 1).padStart(2, "0")}/${String(w.dueDate.month || 1).padStart(2, "0")}/${w.dueDate.year}`;
+                }
+                if (!isTurnedIn) {
+                  pendingWork.push({
+                    id: w.id,
+                    courseName: c.name,
+                    title: w.title,
+                    dueDate: dueStr,
+                    alternateLink: w.alternateLink || "",
+                    isTurnedIn: false
+                  });
+                  if (addAutoSyncedQuestIfMissing(`[${c.name}] ${w.title}${dueStr ? " (" + dueStr + ")" : ""}`, "side", "INT", "Classroom")) {
+                    newQuestsAdded++;
+                  }
+                }
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      if (cfg.classroomIcalUrl) {
+        try {
+          const icsRaw = await nativeHttpRequest(cfg.classroomIcalUrl.trim(), "GET", "");
+          const icalEvents = parseIcalText(icsRaw);
+          for (const ev of icalEvents) {
+            pendingWork.push(ev);
+            if (addAutoSyncedQuestIfMissing(`[Classroom] ${ev.title}${ev.dueDate ? " (" + ev.dueDate + ")" : ""}`, "side", "INT", "Classroom")) {
+              newQuestsAdded++;
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (pendingWork.length > 0) {
+        APP_STATE.classroom = {
+          coursesCount,
+          pendingWork: pendingWork.slice(0, 15)
+        };
+      }
+
+      return { count: pendingWork.length, newQuestsAdded };
+    }
+
+    async function syncSuapAndClassroomDirect(mode = "both") {
+      if (!APP_STATE) return;
+      const cfg = getPluginCredentials();
+      const statusEl = document.getElementById("pluginSyncStatusText");
+      const btnSuap = document.getElementById("btnSyncSuapDirect");
+      const btnCr = document.getElementById("btnSyncClassroomDirect");
+
+      if (btnSuap && (mode === "suap" || mode === "both")) btnSuap.textContent = "⏳...";
+      if (btnCr && (mode === "classroom" || mode === "both")) btnCr.textContent = "⏳...";
+      showToast("🔄 Sincronizando direto pelo celular...");
+
+      let msgParts = [];
+      try {
+        if (mode === "suap" || mode === "both") {
+          if (statusEl) statusEl.textContent = "🔐 Autenticando e baixando diários 2026.2 do SUAP (IFF)...";
+          const resSuap = await runStandaloneSuapSync(cfg);
+          msgParts.push(`${resSuap.count} matérias SUAP`);
+        }
+        if (mode === "classroom" || mode === "both") {
+          if (statusEl) statusEl.textContent = "📌 Consultando turmas e atividades do Google Classroom...";
+          const resCr = await runStandaloneClassroomSync(cfg);
+          if (resCr.count > 0) msgParts.push(`${resCr.count} atividades Classroom`);
+        }
+
+        const nowStr = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        cfg.lastSync = `Sync ${nowStr}`;
+        localStorage.setItem("nc_rpg_plugin_creds", JSON.stringify(cfg));
+        APP_STATE.syncPluginSettings = cfg;
+        saveLocalState();
+        renderAll();
+
+        const summary = msgParts.length ? msgParts.join(" + ") : "Dados em dia";
+        if (statusEl) statusEl.textContent = `✅ Sincronizado pelo celular às ${nowStr} (${summary})!`;
+        showToast(`✅ Atualizado: ${summary}!`);
+      } catch (e) {
+        const errMsg = e && e.message ? e.message : "Verifique sua conexão ou credenciais";
+        if (statusEl) statusEl.textContent = `⚠️ ${errMsg}`;
+        showToast(`⚠️ ${errMsg}`);
+      } finally {
+        if (btnSuap) btnSuap.textContent = "🔄 Sync SUAP";
+        if (btnCr) btnCr.textContent = "🔄 Sync";
+      }
+    }
+
+    // ---------------- SINCRONIZAÇÃO OPCIONAL COM O PC ----------------
+    async function syncWithObsidianNow() {
+      const inputEl = document.getElementById("inputPcServerUrl");
+      const rawUrl = (inputEl ? inputEl.value.trim() : "") || "http://localhost:8077";
+      const baseUrl = rawUrl.replace(/\/+$/, "");
+      localStorage.setItem("nc_pc_server_url", baseUrl);
+
+      showToast("🔄 Conectando ao PC...");
+      try {
+        const res = await fetch(`${baseUrl}/api/sync/merge`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pendingActions: PENDING_SYNC_ACTIONS,
+            dailyQuests: APP_STATE ? APP_STATE.dailyQuests : [],
+            quests: APP_STATE ? APP_STATE.quests : [],
+            notifications: APP_STATE ? APP_STATE.notifications : {}
+          })
+        });
+        const data = await res.json();
+        if (data && data.state) {
+          APP_STATE = data.state;
+          PENDING_SYNC_ACTIONS = [];
+          saveLocalState();
+          renderAll();
+          showToast("✅ Sincronizado com o PC!");
+        }
+      } catch (e) {
+        showToast("⚠️ PC fora da rede. Use o botão [Copiar Backup JSON] abaixo.");
+      }
+    }
+
+    function copyOfflineSyncPackage() {
+      const payload = JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        pendingActions: PENDING_SYNC_ACTIONS
+      }, null, 2);
+      const box = document.getElementById("offlineSyncBox");
+      if (box) {
+        box.value = payload;
+        box.select();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payload).catch(() => {});
+      } else {
+        try { document.execCommand("copy"); } catch (e) {}
+      }
+      showToast("📤 Backup JSON copiado!");
+    }
+
+    function clearPendingSyncQueue() {
+      PENDING_SYNC_ACTIONS = [];
+      saveLocalState();
+      const box = document.getElementById("offlineSyncBox");
+      if (box) box.value = "";
+      showToast("🧹 Fila limpa!");
+    }
+
+    function escapeHtml(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeJs(s) {
+      return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
+    fetchState(true);
+  </script>
+</body>
+</html>
